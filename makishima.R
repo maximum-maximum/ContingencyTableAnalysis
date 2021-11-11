@@ -12,27 +12,24 @@ sample <- data.frame(freq,row,col)
 
 ### SI ###
 array_cs <- array (0, dim =c(NI^2, (NI-1)))
-index_i <- index_j <- 0
 
-index_i <- index_i + 1
-for (i in 1:NI^2) {
-  index_j <- index_j + 1
+k <- 1
+for (i in 1:NI) {
   for (j in 1:(NI-1)) {
-    
-    
+    print(k)
+    print("--------")
     print(i)
-    #print(index_i)
     print("--------")
     print(j)
-    #print(index_j)
     print("--------")
-    
-    if (i==index_i) {
-      array_cs[i, j] <- array_cs[i, j] + 1
-    } 
-    if (j==index_j) {
-      array_cs[i, j] <- array_cs[i, j] + 1
-    } 
+    if (i <= (NI-1)) {
+      array_cs[k, i] <- array_cs[k, i] + 1  
+    }
+    if (j <= (NI-1)) {
+      array_cs[k, j] <- array_cs[k, j] + 1
+    }
+    k <- k + 1
   }
 }
+
 ### SU ###
