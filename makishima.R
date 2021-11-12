@@ -10,26 +10,38 @@ col <- gl(NI,1,length=NI^2)
 u <- c(1:NI)
 sample <- data.frame(freq,row,col)
 
+
 ### SI ###
-array_cs <- array (0, dim =c(NI^2, (NI-1)))
+array_si <- array(0, dim=c(NI^2, (NI-1)))
 
 k <- 1
 for (i in 1:NI) {
   for (j in 1:(NI-1)) {
-    print(k)
-    print("--------")
-    print(i)
-    print("--------")
-    print(j)
-    print("--------")
     if (i <= (NI-1)) {
-      array_cs[k, i] <- array_cs[k, i] + 1  
+      array_si[k, i] <- array_si[k, i] + 1  
     }
     if (j <= (NI-1)) {
-      array_cs[k, j] <- array_cs[k, j] + 1
+      array_si[k, j] <- array_si[k, j] + 1
     }
     k <- k + 1
   }
 }
 
+
 ### SU ###
+array_su <- array(0, dim=c(NI^2, (NI-1)))
+
+l <- 1
+for (i in 1:NI) {
+  for (j in 1:(NI-1)) {
+    if (i <= (NI-1)) {
+      array_su[l, i] <- array_su[l, i] + 1  
+    }
+    if (j <= (NI-1)) {
+      array_su[l, j] <- array_su[l, j] + 1
+    }
+    l <- l + 1
+  }
+}
+
+array_su2 <- c(1:NI %x% 1:NI)
