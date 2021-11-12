@@ -31,7 +31,7 @@ freq3 <- c(6, 2, 3, 1, 9, 4, 2, 1, 9, 2, 3, 1, 12, 1, 2, 1)
 
   ### SU ###
   theta <- c(1:NI %x% 1:NI)
-  array_su <- cbind(array_su, theta)
+  array_su <- cbind(array_si, theta)
 
 
   ### Answer ###
