@@ -1,6 +1,7 @@
 library(Rsolnp)
-#freq <- c(374,602,170,64,18,255,139,71,4,23,42,55,2,6,17,53)
+
 freq <- c(29, 3, 3, 4, 5, 0, 1, 1, 9, 0, 2, 0, 7, 3, 1, 0)
+freq2 <- c(374,602,170,64,18,255,139,71,4,23,42,55,2,6,17,53)
 freq3 <- c(6, 2, 3, 1, 9, 4, 2, 1, 9, 2, 3, 1, 12, 1, 2, 1)
 
 # model = function(freq) {
@@ -52,16 +53,20 @@ freq3 <- c(6, 2, 3, 1, 9, 4, 2, 1, 9, 2, 3, 1, 12, 1, 2, 1)
   for (k in 1:(NI-1)) {
     for (i in 1:NI) {
       for (j in 1:NI) {
-        array_f[i, j, k] <- u[j]^k - u[i]^k
+        array_f[i, j, k] <- i^k - j^k
       }
     }
   }
   f <- list()
   for (k in 1:(NI-1)) {
     f[[k]] <- c(aperm(array_f[,,k]))
-    f
   }
   
+
+  ##### LSQUk #####
+
+  
+
   ## In a manner similar to Lawal (2001, 2004), 
   ## the following code defines XS, and s is the matrix corresponding to XS
   array_s <- array(0, dim=c(1,NI,NI))
@@ -85,8 +90,6 @@ freq3 <- c(6, 2, 3, 1, 9, 4, 2, 1, 9, 2, 3, 1, 12, 1, 2, 1)
   m <- append(m, list (SI = glm (freq~array_si, family = poisson, data = sample )))
   m <- append(m, list (SU = glm (freq~array_su, family = poisson, data = sample )))
   #m <- append (m, list (SItheta = glm (freq~array_si+theta, family = poisson, data = sample )))
-  LSk <- ELSk <- list()
-  str <- str2 <- c()
   
   ans_si <- ans_su <- c()
 # }
