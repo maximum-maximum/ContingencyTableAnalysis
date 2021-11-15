@@ -56,20 +56,23 @@ model = function(freq) {
   }
 
   theta_lsquk <- theta
-  psi <- c()
   k <- 1
-  for (i in 1:NI){
-    for (j in 1:NI){
+  for (i in 1:NI) {
+    for (j in 1:NI) {
       if (i == j) {
         theta_lsquk[k] <- 0
-        psi[k] <- 1
-      } else {
-        psi[k] <- 0
+        k <- k + 1
       }
-      k <- k + 1
     }
   }
 
+  array_psi <- array(0, dim=c(NI^2, NI))
+  for (i in 1:NI) {
+    for (j in i:NI) {
+      array_psi[j+NI*(j-1), i] <- 1
+      break
+    }
+  }
   
   
   ##### LSQUk ver.2 #####
@@ -105,9 +108,9 @@ model = function(freq) {
   m <- append(m, list(SI = glm(freq~array_si, family=poisson, data=sample)))
   m <- append(m, list(SU = glm(freq~array_su, family=poisson, data=sample)))
   
-  m <- append(m, list(LSQUk_ver1 = glm(freq~array_si+f[[1]]+theta_lsquk+psi, family=poisson, data=sample)))
-  m <- append(m, list(LSQUk_ver1 = glm(freq~array_si+f[[2]]+theta_lsquk+psi, family=poisson, data=sample)))
-  m <- append(m, list(LSQUk_ver1 = glm(freq~array_si+f[[3]]+theta_lsquk+psi, family=poisson, data=sample)))
+  m <- append(m, list(LSQUk_ver1 = glm(freq~array_si+f[[1]]+theta_lsquk+array_psi, family=poisson, data=sample)))
+  m <- append(m, list(LSQUk_ver1 = glm(freq~array_si+f[[2]]+theta_lsquk+array_psi, family=poisson, data=sample)))
+  m <- append(m, list(LSQUk_ver1 = glm(freq~array_si+f[[3]]+theta_lsquk+array_psi, family=poisson, data=sample)))
   
   # m <- append(m, list(LSQUk_ver2 = glm(freq~cs+f2[[1]]+theta, family=poisson, data=sample)))
   # m <- append(m, list(LSQUk_ver2 = glm(freq~cs+f2[[2]]+theta, family=poisson, data=sample)))
