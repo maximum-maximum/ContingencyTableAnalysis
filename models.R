@@ -16,6 +16,50 @@ model = function(freq) {
 
 
   
+  ##### define design matrices #####
+  array1 <- array(0, dim=c(NI^2, (NI-1)))
+  k <- 1
+  for (i in 1:NI) {
+    for (j in 1:(NI-1)) {
+      if (i <= (NI-1)) {
+        array1[k, i] <- array1[k, i] + 1
+      }
+      if (j <= (NI-1)) {
+        array1[k, j] <- array1[k, j] + 1
+      }
+      k <- k + 1
+    }
+  }
+  
+  array2  <- c(1:NI %x% 1:NI)
+  
+  array2star <- array2
+  for (i in 1:NI) {
+    array2star[i+NI*(i-1)] <- 0
+  }
+  
+  array3 <- array(0, dim=c(NI,NI,NI-1))
+  for (k in 1:(NI-1)) {
+    for (i in 1:NI) {
+      for (j in 1:NI) {
+        array_f[i, j, k] <- i^k - j^k
+      }
+    }
+  }
+  f <- list()
+  for (k in 1:(NI-1)) {
+    f[[k]] <- c(aperm(array_f[,,k]))
+  }
+  
+  array4 <- array(0, dim=c(NI^2, NI))
+  for (i in 1:NI) {
+    for (j in i:NI) {
+      array_psi[j+NI*(j-1), i] <- 1
+      break
+    }
+  }
+  
+  
   ##### SI #####
   array_si <- array(0, dim=c(NI^2, (NI-1)))
   k <- 1
@@ -56,14 +100,8 @@ model = function(freq) {
   }
 
   theta_lsquk <- theta
-  k <- 1
   for (i in 1:NI) {
-    for (j in 1:NI) {
-      if (i == j) {
-        theta_lsquk[k] <- 0
-        k <- k + 1
-      }
-    }
+    theta_lsquk[i+NI*(i-1)] <- 0
   }
 
   array_psi <- array(0, dim=c(NI^2, NI))
@@ -101,6 +139,9 @@ model = function(freq) {
     f2[[k]] <- c(aperm(array_f[,,k]))
   }
   
+  
+  
+  ##### SQU #####
   
   
   ### Answer ###
