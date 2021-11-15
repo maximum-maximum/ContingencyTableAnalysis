@@ -1,8 +1,9 @@
 library(Rsolnp)
 
-freq <- c(29, 3, 3, 4, 5, 0, 1, 1, 9, 0, 2, 0, 7, 3, 1, 0)
-freq2 <- c(374,602,170,64,18,255,139,71,4,23,42,55,2,6,17,53)
-freq3 <- c(6, 2, 3, 1, 9, 4, 2, 1, 9, 2, 3, 1, 12, 1, 2, 1)
+freq <- c(374,602,170,64,18,255,139,71,4,23,42,55,2,6,17,53) # Tahata2016
+freq2 <- c(29, 3, 3, 4, 5, 0, 1, 1, 9, 0, 2, 0, 7, 3, 1, 0) # Yamamoto, Tomizawa 2010 Table1
+freq3 <- c(6, 2, 3, 1, 9, 4, 2, 1, 9, 2, 3, 1, 12, 1, 2, 1) # Yamamoto, Tomizawa 2010 Table2
+
 
 model = function(freq) {
   NI <- ifelse(floor(sqrt(length(freq)))
