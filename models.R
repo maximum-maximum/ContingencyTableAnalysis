@@ -42,19 +42,19 @@ model = function(freq) {
   for (k in 1:(NI-1)) {
     for (i in 1:NI) {
       for (j in 1:NI) {
-        array_f[i, j, k] <- i^k - j^k
+        array3[i, j, k] <- i^k - j^k
       }
     }
   }
   f <- list()
   for (k in 1:(NI-1)) {
-    f[[k]] <- c(aperm(array_f[,,k]))
+    f[[k]] <- c(aperm(array3[,,k]))
   }
   
   array4 <- array(0, dim=c(NI^2, NI))
   for (i in 1:NI) {
     for (j in i:NI) {
-      array_psi[j+NI*(j-1), i] <- 1
+      array4[j+NI*(j-1), i] <- 1
       break
     }
   }
@@ -145,7 +145,7 @@ model = function(freq) {
   
   
   ### Answer ###
-  m <- list ()
+  m <- list()
   m <- append(m, list(SI = glm(freq~array_si, family=poisson, data=sample)))
   m <- append(m, list(SU = glm(freq~array_su, family=poisson, data=sample)))
   
