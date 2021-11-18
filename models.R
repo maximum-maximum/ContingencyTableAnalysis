@@ -27,7 +27,7 @@ model = function(freq) {
   array1 <- array(0, dim=c(NI^2, (NI-1)))
   k <- 1
   for (i in 1:NI) {
-    for (j in 1:(NI-1)) {
+    for (j in 1:NI) {
       if (i <= (NI-1)) {
         array1[k, i] <- array1[k, i] + 1
       }
