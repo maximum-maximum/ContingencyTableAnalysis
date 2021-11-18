@@ -77,39 +77,41 @@ model = function(freq) {
   array_su <- cbind(array1, array2)
 
 
-  ### LSQIk
-  array_lsqi1 <- cbind(array1, f[[1]], array4)
-  array_lsqi2 <- cbind(array1, f[[2]], array4)
-  array_lsqi3 <- cbind(array1, f[[3]], array4)
-  
-  
-  ### LSQUk
-  array_lsqu1 <- cbind(array1, f[[1]], array4, array2star)
-  array_lsqu2 <- cbind(array1, f[[2]], array4, array2star)
-  array_lsqu3 <- cbind(array1, f[[3]], array4, array2star)
-
-
   ### SQU
   array_squ <- cbind(array1, array4, array2star)
-
-
+  
+  
   ### S
   array_s <- array(0,dim=c(1,NI,NI))
   s <- c()
-  for(i in 1:NI){
-    for(j in 1:NI){
-      if(i==j){
-        array_s[1,i,j]=1
-        s <-cbind(s,c(array_s[1,,]))
-      }else if(i<j){
-        array_s[1,i,j]=array_s[1,j,i]=1
-        s <- cbind(s,c(array_s[1,,]))
+  for (i in 1:NI) {
+    for (j in 1:NI) {
+      if (i == j) {
+        array_s[1, i, j] <- 1
+        s <- cbind(s, c(array_s[1,,]))
+      } else if (i < j){
+        array_s[1, i, j] <- array_s[1, j, i] <- 1
+        s <- cbind(s, c(array_s[1,,]))
       }
-      array_s <- array(0,dim=c(1,NI,NI))
+      array_s <- array(0, dim=c(1,NI,NI))
     }
   }
   
-
+  
+  ### LSQIk
+  for (i in 1:(NI-1)) {
+    array_lsqi_i <- paste('array_lsqi', i, sep='')
+    assign(array_lsqi_i, cbind(array1, f[[i]], array4)) 
+  }
+  
+  
+  ### LSQUk
+  for (i in 1:(NI-1)) {
+    array_lsqu_i <- paste('array_lsqu', i, sep='')
+    assign(array_lsqu_i, cbind(array1, f[[i]], array4, array2star)) 
+  }
+  
+  
   
   ##### result #####
   m <- list()
