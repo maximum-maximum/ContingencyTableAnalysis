@@ -1,6 +1,6 @@
 library(Rsolnp)
 
-##### data samples #####
+##### Data samples #####
 ## Yamamoto-Tomizawa2010 Table1
 freq <- c(29, 3, 3, 4, 5, 0, 1, 1, 9, 0, 2, 0, 7, 3, 1, 0) 
 
@@ -26,7 +26,7 @@ model = function(freq) {
 
 
   
-  ##### define design matrices #####
+  ##### Define design matrices #####
   array1 <- array(0, dim=c(NI^2, (NI-1)))
   k <- 1
   for (i in 1:NI) {
@@ -71,7 +71,7 @@ model = function(freq) {
   
   
   
-  ##### bind matrices #####
+  ##### Bind matrices #####
   ### SI 
   array_si <- array1
   
@@ -116,7 +116,7 @@ model = function(freq) {
   
   
   
-  ##### result #####
+  ##### Show results #####
   m <- list()
   m <- append(m, list(SI = glm(freq~array_si, family=poisson, data=sample)))
   m <- append(m, list(SU = glm(freq~array_su, family=poisson, data=sample)))
