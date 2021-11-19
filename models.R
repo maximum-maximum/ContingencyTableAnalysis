@@ -7,8 +7,11 @@ freq <- c(29, 3, 3, 4, 5, 0, 1, 1, 9, 0, 2, 0, 7, 3, 1, 0)
 ## Yamamoto-Tomizawa2010 Table2
 freq2 <- c(6, 2, 3, 1, 9, 4, 2, 1, 9, 2, 3, 1, 12, 1, 2, 1) 
 
-## Tominaga1979 (Tahata2016, Tahata-Sudo-Arimoto)
+## Tominaga1979 (Tahata2016)
 freq3 <- c(374, 602, 170, 64, 18, 255, 139, 71, 4, 23, 42, 55, 2, 6, 17, 53) 
+
+## Smith2006 (Tahata-Sudo-Arimoto)
+freq4 <- c(98, 150, 135, 53, 37, 131, 133, 43, 9, 16, 33, 15, 4, 1, 4, 21)
 
 
 
@@ -16,8 +19,8 @@ model = function(freq) {
   NI <- ifelse(floor(sqrt(length(freq)))
               <ceiling(sqrt(length(freq))),
               stop(),sqrt(length(freq)))
-  row <- gl(NI,NI,length=NI^2)
-  col <- gl(NI,1,length=NI^2)
+  row <- gl(NI, NI, length=NI^2)
+  col <- gl(NI, 1, length=NI^2)
   u <- c(1:NI)
   sample <- data.frame(freq, row, col)
 
@@ -82,7 +85,7 @@ model = function(freq) {
   
   
   ### S
-  array_s <- array(0,dim=c(1,NI,NI))
+  array_s <- array(0, dim=c(1,NI,NI))
   s <- c()
   for (i in 1:NI) {
     for (j in 1:NI) {
