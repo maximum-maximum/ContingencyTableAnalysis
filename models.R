@@ -102,17 +102,11 @@ model = function(freq) {
   
   
   ### LSQIk
-  for (i in 1:(NI-1)) {
-    array_lsqi_i <- paste('array_lsqi', i, sep='')
-    assign(array_lsqi_i, cbind(array1, f[[i]], array4)) 
-  }
+  for (i in 1:(NI-1)) assign(paste('array_lsqi', i, sep=''), cbind(array1, f[[i]], array4)) 
   
   
   ### LSQUk
-  for (i in 1:(NI-1)) {
-    array_lsqu_i <- paste('array_lsqu', i, sep='')
-    assign(array_lsqu_i, cbind(array1, f[[i]], array4, array2star)) 
-  }
+  for (i in 1:(NI-1)) assign(paste('array_lsqu', i, sep=''), cbind(array1, f[[i]], array4, array2star)) 
   
   
   
@@ -125,12 +119,12 @@ model = function(freq) {
 
   for (i in 1:(NI-1)) {
     m <- append(m, list(glm(as.formula(paste('freq~array_lsqi', i, sep='')), family=poisson, data=sample)))
-    names(m)[length(m)] <- paste('LSQI', i, sep = '')  
+    names(m)[length(m)] <- paste('LSQI', i, sep='')  
   }
 
   for (i in 1:(NI-1)) {
     m <- append(m, list(glm(as.formula(paste('freq~array_lsqu', i, sep='')), family=poisson, data=sample)))
-    names(m)[length(m)] <- paste('LSQU', i, sep = '')  
+    names(m)[length(m)] <- paste('LSQU', i, sep='')  
   }
   
   # m <- append(m, list(LSQUk_ver1 = glm(freq~array_si+f[[1]]+theta_lsquk+array_psi, family=poisson, data=sample)))
@@ -154,8 +148,12 @@ model = function(freq) {
   
   #m <- append (m, list (SItheta = glm (freq~array_si+theta, family=poisson, data=sample)))
   
+  df <- G2 <- c()
   for (i in 1:length(m)) {
-    print(m[[i]]$deviance)
+    df <- append(df, m[[i]]$df.residual)
+    G2 <- append(G2, m[[i]]$deviance)
+    # print(paste(names(m)[i], m[[i]]$deviance), quote=F)
   }
-  return (m)
+  result <- data.frame(model=names(m), df=df, G2=G2)
+  return (result)
 }
