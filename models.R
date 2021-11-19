@@ -151,7 +151,7 @@ model = function(freq) {
   df <- G2 <- c()
   for (i in 1:length(m)) {
     df <- append(df, m[[i]]$df.residual)
-    G2 <- append(G2, m[[i]]$deviance)
+    G2 <- append(G2, round(m[[i]]$deviance, digits=3))
     # print(paste(names(m)[i], m[[i]]$deviance), quote=F)
   }
   result <- data.frame(model=names(m), df=df, G2=G2)
