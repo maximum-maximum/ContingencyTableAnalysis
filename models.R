@@ -149,10 +149,9 @@ model = function(freq) {
   #m <- append (m, list (SItheta = glm (freq~array_si+theta, family=poisson, data=sample)))
   
   df <- G2 <- c()
-  for (i in 1:length(m)) {
-    df <- append(df, m[[i]]$df.residual)
-    G2 <- append(G2, round(m[[i]]$deviance, digits=3))
-    # print(paste(names(m)[i], m[[i]]$deviance), quote=F)
+  for (i in m) {
+    df <- append(df, i$df.residual)
+    G2 <- append(G2, round(i$deviance, digits=3))
   }
   result <- data.frame(model=names(m), df=df, G2=G2)
   return (result)
