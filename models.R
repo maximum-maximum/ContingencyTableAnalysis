@@ -1,5 +1,3 @@
-library(Rsolnp)
-
 ##### Data samples #####
 ## Yamamoto-Tomizawa2010 Table1
 freq <- c(29, 3, 3, 4, 5, 0, 1, 1, 9, 0, 2, 0, 7, 3, 1, 0) 
@@ -15,7 +13,7 @@ freq4 <- c(98, 150, 135, 53, 37, 131, 133, 43, 9, 16, 33, 15, 4, 1, 4, 21)
 
 
 
-model = function(freq) {
+model <- function(freq) {
   NI <- ifelse(floor(sqrt(length(freq)))
               <ceiling(sqrt(length(freq))),
               stop(),sqrt(length(freq)))
@@ -31,12 +29,8 @@ model = function(freq) {
   k <- 1
   for (i in 1:NI) {
     for (j in 1:NI) {
-      if (i <= (NI-1)) {
-        array1[k, i] <- array1[k, i] + 1
-      }
-      if (j <= (NI-1)) {
-        array1[k, j] <- array1[k, j] + 1
-      }
+      if (i <= (NI-1)) array1[k, i] <- array1[k, i] + 1
+      if (j <= (NI-1)) array1[k, j] <- array1[k, j] + 1
       k <- k + 1
     }
   }
@@ -44,9 +38,7 @@ model = function(freq) {
   array2 <- c(1:NI %x% 1:NI)
   
   array2star <- array2
-  for (i in 1:NI) {
-    array2star[i+NI*(i-1)] <- 0
-  }
+  for (i in 1:NI) array2star[i+NI*(i-1)] <- 0
   
   array3 <- array(0, dim=c(NI,NI,NI-1))
   for (k in 1:(NI-1)) {
