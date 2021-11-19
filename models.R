@@ -92,7 +92,7 @@ model = function(freq) {
       if (i == j) {
         array_s[1, i, j] <- 1
         s <- cbind(s, c(array_s[1,,]))
-      } else if (i < j){
+      } else if (i < j) {
         array_s[1, i, j] <- array_s[1, j, i] <- 1
         s <- cbind(s, c(array_s[1,,]))
       }
@@ -122,12 +122,16 @@ model = function(freq) {
   m <- append(m, list(SU = glm(freq~array_su, family=poisson, data=sample)))
   m <- append(m, list(SQU = glm(freq~array_squ, family=poisson, data=sample)))
   m <- append(m, list(S = glm(freq~s, family=poisson, data=sample)))
-  m <- append(m, list(LSQI1 = glm(freq~array_lsqi1, family=poisson, data=sample)))
-  m <- append(m, list(LSQI2 = glm(freq~array_lsqi2, family=poisson, data=sample)))
-  m <- append(m, list(LSQI3 = glm(freq~array_lsqi3, family=poisson, data=sample)))
-  m <- append(m, list(LSQU1 = glm(freq~array_lsqu1, family=poisson, data=sample)))
-  m <- append(m, list(LSQU2 = glm(freq~array_lsqu2, family=poisson, data=sample)))
-  m <- append(m, list(LSQU3 = glm(freq~array_lsqu3, family=poisson, data=sample)))
+
+  for (i in 1:(NI-1)) {
+    m <- append(m, list(glm(as.formula(paste('freq~array_lsqi', i, sep='')), family=poisson, data=sample)))
+    names(m)[length(m)] <- paste('LSQI', i, sep = '')  
+  }
+
+  for (i in 1:(NI-1)) {
+    m <- append(m, list(glm(as.formula(paste('freq~array_lsqu', i, sep='')), family=poisson, data=sample)))
+    names(m)[length(m)] <- paste('LSQU', i, sep = '')  
+  }
   
   # m <- append(m, list(LSQUk_ver1 = glm(freq~array_si+f[[1]]+theta_lsquk+array_psi, family=poisson, data=sample)))
   # m <- append(m, list(LSQUk_ver1 = glm(freq~array_si+f[[2]]+theta_lsquk+array_psi, family=poisson, data=sample)))
