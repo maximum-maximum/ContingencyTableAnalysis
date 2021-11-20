@@ -1,3 +1,5 @@
+rm(list = ls())
+
 ##### Data samples #####
 ## Yamamoto-Tomizawa2010 Table1
 freq <- c(29, 3, 3, 4, 5, 0, 1, 1, 9, 0, 2, 0, 7, 3, 1, 0) 
@@ -35,10 +37,13 @@ model <- function(freq) {
     }
   }
   
+  
   array2 <- c(1:NI %x% 1:NI)
+  
   
   array2star <- array2
   for (i in 1:NI) array2star[i+NI*(i-1)] <- 0
+  
   
   array3 <- array(0, dim=c(NI,NI,NI-1))
   for (k in 1:(NI-1)) {
@@ -52,6 +57,7 @@ model <- function(freq) {
   for (k in 1:(NI-1)) {
     f[[k]] <- c(aperm(array3[,,k]))
   }
+  
   
   array4 <- array(0, dim=c(NI^2, NI))
   for (i in 1:NI) {
@@ -94,11 +100,11 @@ model <- function(freq) {
   
   
   ### LSQIk
-  for (i in 1:(NI-1)) assign(paste('array_lsqi', i, sep=''), cbind(array1, f[[i]], array4)) 
+  for (i in 1:(NI-1)) assign(paste0('array_lsqi', i), cbind(array1, f[[i]], array4)) 
   
   
   ### LSQUk
-  for (i in 1:(NI-1)) assign(paste('array_lsqu', i, sep=''), cbind(array1, f[[i]], array4, array2star)) 
+  for (i in 1:(NI-1)) assign(paste0('array_lsqu', i), cbind(array1, f[[i]], array4, array2star)) 
   
   
   
@@ -110,13 +116,13 @@ model <- function(freq) {
   m <- append(m, list(S = glm(freq~s, family=poisson, data=sample)))
 
   for (i in 1:(NI-1)) {
-    m <- append(m, list(glm(as.formula(paste('freq~array_lsqi', i, sep='')), family=poisson, data=sample)))
-    names(m)[length(m)] <- paste('LSQI', i, sep='')  
+    m <- append(m, list(glm(as.formula(paste0('freq~array_lsqi', i)), family=poisson, data=sample)))
+    names(m)[length(m)] <- paste0('LSQI', i)  
   }
 
   for (i in 1:(NI-1)) {
-    m <- append(m, list(glm(as.formula(paste('freq~array_lsqu', i, sep='')), family=poisson, data=sample)))
-    names(m)[length(m)] <- paste('LSQU', i, sep='')  
+    m <- append(m, list(glm(as.formula(paste0('freq~array_lsqu', i)), family=poisson, data=sample)))
+    names(m)[length(m)] <- paste0('LSQU', i)  
   }
   
   # m <- append(m, list(LSQUk_ver1 = glm(freq~array_si+f[[1]]+theta_lsquk+array_psi, family=poisson, data=sample)))
