@@ -1,4 +1,7 @@
+##### Delete existing objects #####
 rm(list = ls())
+
+
 
 ##### Data samples #####
 ## Yamamoto-Tomizawa2010 Table1
@@ -133,19 +136,7 @@ model <- function(freq) {
   # m <- append(m, list(LSQUk_ver2 = glm(freq~cs+f2[[2]]+theta, family=poisson, data=sample)))
   # m <- append(m, list(LSQUk_ver2 = glm(freq~cs+f2[[3]]+theta, family=poisson, data=sample)))
 
-  # m <- append(m, list(LSQUk_ver1 = glm(freq~array_si+f[[1]]+theta_lsquk+psi, family=poisson, data=sample)))
-  # m <- append(m, list(LSQUk_ver2 = glm(freq~cs+f2[[1]]+theta, family=poisson, data=sample)))
-  # m <- append(m, list(LSQUk_ver1 = glm(freq~array_si+f[[2]]+theta_lsquk+psi, family=poisson, data=sample)))
-  # m <- append(m, list(LSQUk_ver2 = glm(freq~cs+f2[[2]]+theta, family=poisson, data=sample)))
-  # m <- append(m, list(LSQUk_ver1 = glm(freq~array_si+f[[3]]+theta_lsquk+psi, family=poisson, data=sample)))
-  # m <- append(m, list(LSQUk_ver2 = glm(freq~cs+f2[[3]]+theta, family=poisson, data=sample)))
-  
-  #m <- append(m, list(LSQIk = glm(freq~array_si+f[[1]]+psi, family=poisson, data=sample)))
-  #m <- append(m, list(LSQIk = glm(freq~array_si+f[[2]]+psi, family=poisson, data=sample)))
-  #m <- append(m, list(LSQIk = glm(freq~array_si+f[[3]]+psi, family=poisson, data=sample)))
-  
-  #m <- append (m, list (SItheta = glm (freq~array_si+theta, family=poisson, data=sample)))
-  
+
   df <- G2 <- c()
   for (i in m) {
     df <- append(df, i$df.residual)
