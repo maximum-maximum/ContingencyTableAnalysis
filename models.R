@@ -24,7 +24,6 @@ model <- function(freq) {
               stop(),sqrt(length(freq)))
   row <- gl(NI, NI, length=NI^2)
   col <- gl(NI, 1, length=NI^2)
-  u <- c(1:NI)
   sample <- data.frame(freq, row, col)
 
 
