@@ -1,9 +1,9 @@
-##### Delete existing objects #####
+##### delete existing objects #####
 rm(list = ls())
 
 
 
-##### Data samples #####
+##### data samples #####
 ## Yamamoto-Tomizawa2010 Table1
 freq <- c(29, 3, 3, 4, 5, 0, 1, 1, 9, 0, 2, 0, 7, 3, 1, 0) 
 
@@ -19,16 +19,14 @@ freq4 <- c(98, 150, 135, 53, 37, 131, 133, 43, 9, 16, 33, 15, 4, 1, 4, 21)
 
 
 model <- function(freq) {
-  NI <- ifelse(floor(sqrt(length(freq)))
-              <ceiling(sqrt(length(freq))),
-              stop(),sqrt(length(freq)))
+  NI <- ifelse(floor(sqrt(length(freq))) < ceiling(sqrt(length(freq))), stop(), sqrt(length(freq)))
   row <- gl(NI, NI, length=NI^2)
   col <- gl(NI, 1, length=NI^2)
   sample <- data.frame(freq, row, col)
 
 
   
-  ##### Define design matrices #####
+  ##### define design matrices #####
   array1 <- array(0, dim=c(NI^2, (NI-1)))
   k <- 1
   for (i in 1:NI) {
@@ -71,7 +69,7 @@ model <- function(freq) {
   
   
   
-  ##### Bind matrices #####
+  ##### bind matrices #####
   ### SI 
   array_si <- array1
   
@@ -102,24 +100,31 @@ model <- function(freq) {
   
   
   ### LSQIk
-  for (i in 1:(NI-1)) assign(paste0('array_lsqi', i), cbind(array1, f[[i]], array4)) 
+  ff <- c()
+  for (i in 1:(NI-1)) {
+    ff <- cbind(ff, f[[i]])
+    assign(paste0('array_lsqi', i), cbind(array1, ff, array4))  
+  }
   
   
   ### LSQUk
-  for (i in 1:(NI-1)) assign(paste0('array_lsqu', i), cbind(array1, f[[i]], array4, array2star)) 
+  ff <- c()
+  for (i in 1:(NI-1)) {
+    ff <- cbind(ff, f[[i]])
+    assign(paste0('array_lsqu', i), cbind(array1, ff, array4, array2star)) 
+  }
   
   
-  
-  ##### Show results #####
+  ##### show results #####
   m <- list()
-  m <- append(m, list(SI = glm(freq~array_si, family=poisson, data=sample)))
-  m <- append(m, list(SU = glm(freq~array_su, family=poisson, data=sample)))
-  m <- append(m, list(SQU = glm(freq~array_squ, family=poisson, data=sample)))
-  m <- append(m, list(S = glm(freq~s, family=poisson, data=sample)))
+  m <- append(m, list(SI=glm(freq~array_si, family=poisson, data=sample)))
+  m <- append(m, list(SU=glm(freq~array_su, family=poisson, data=sample)))
+  m <- append(m, list(SQU=glm(freq~array_squ, family=poisson, data=sample)))
+  m <- append(m, list(S=glm(freq~s, family=poisson, data=sample)))
 
   for (i in 1:(NI-1)) {
     m <- append(m, list(glm(as.formula(paste0('freq~array_lsqi', i)), family=poisson, data=sample)))
-    names(m)[length(m)] <- paste0('LSQI', i)  
+    names(m)[length(m)] <- paste0('LSQI', i)
   }
 
   for (i in 1:(NI-1)) {
@@ -141,6 +146,5 @@ model <- function(freq) {
     df <- append(df, i$df.residual)
     G2 <- append(G2, round(i$deviance, digits=3))
   }
-  result <- data.frame(model=names(m), df=df, G2=G2)
-  return (result)
+  return (data.frame(model=names(m), df=df, G2=G2))
 }
