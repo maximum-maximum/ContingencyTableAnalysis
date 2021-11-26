@@ -131,6 +131,33 @@ model <- function(freq) {
   }
   
   
+  ### MEk
+  library(Rsolnp)
+  ConstFunc_MEk = function(p){
+    const <- c()
+    sum <- sum(p)
+    const <- append(const,sum-1)
+    l <- ifelse(length(solution_MEk)>=(NI-1),length(solution_GGMk) + 1,length(solution_MEk) + 1)
+    for(k in 1:l) const <- append(const,sum((f[[k]])*p))
+    return(const)
+  }
+  eq.valueMEk <- list()
+  for(i in 1:(NI-1)) eq.valueMEk <- append(eq.valueMEk,list(rep(0,i+1)))
+  zero <- function(x) return (x[x>0])
+  ObjFunc = function(p) return(-sum(freq*log(p)))
+  saturated_model = function(freq) return(-sum(zero(freq)*log(zero(freq/sum(freq)))))
+  eq.LB <- rep(0,length(freq))
+  p0 <- rep(1/length(freq), length(freq))
+  solution_MEk <- list()
+  for(i in 1:(NI-1)){
+    solution_MEk <- append(solution_MEk, list(solnp(p0, fun=ObjFunc, eqfun=ConstFunc_MEk, eqB=eq.valueMEk[[i]], LB=eq.LB)))
+  }
+  ans_MEk <- c()
+  for(i in 1:(NI-1)){
+    ans_MEk <- append(ans_MEk, -2*(saturated_model(freq) - solution_MEk[[i]]$value[length(solution_MEk[[i]]$value)]))
+  }
+  
+  
   
   ##### show results #####
   m <- list()
@@ -158,6 +185,7 @@ model <- function(freq) {
     m <- append(m, list(glm(as.formula(paste0('freq~array_lsu', i)), family=poisson, data=sample)))
     names(m)[length(m)] <- paste0('LSU', i)  
   }
+
   
   # m <- append(m, list(LSQUk_ver1 = glm(freq~array_si+f[[1]]+theta_lsquk+array_psi, family=poisson, data=sample)))
   # m <- append(m, list(LSQUk_ver1 = glm(freq~array_si+f[[2]]+theta_lsquk+array_psi, family=poisson, data=sample)))
@@ -173,5 +201,7 @@ model <- function(freq) {
     df <- append(df, i$df.residual)
     G2 <- append(G2, round(i$deviance, digits=3))
   }
-  return (data.frame(model=names(m), df=df, G2=G2))
+  result <- data.frame(model=names(m), df=df, G2=G2)
+  for (i in 1:(NI-1)) result <- rbind(result, list(paste0('ME',i), '', round(ans_MEk[i], digits=3)))
+  return (result)
 }
