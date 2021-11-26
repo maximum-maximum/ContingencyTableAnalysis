@@ -78,6 +78,10 @@ model <- function(freq) {
   array_su <- cbind(array1, array2)
 
 
+  ### SQI
+  array_sqi <- cbind(array1, array4)
+  
+  
   ### SQU
   array_squ <- cbind(array1, array4, array2star)
   
@@ -163,6 +167,7 @@ model <- function(freq) {
   m <- list()
   m <- append(m, list(SI=glm(freq~array_si, family=poisson, data=sample)))
   m <- append(m, list(SU=glm(freq~array_su, family=poisson, data=sample)))
+  m <- append(m, list(SQI=glm(freq~array_sqi, family=poisson, data=sample)))
   m <- append(m, list(SQU=glm(freq~array_squ, family=poisson, data=sample)))
   m <- append(m, list(S=glm(freq~s, family=poisson, data=sample)))
 
