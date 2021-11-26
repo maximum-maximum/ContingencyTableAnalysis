@@ -13,7 +13,7 @@ freq2 <- c(6, 2, 3, 1, 9, 4, 2, 1, 9, 2, 3, 1, 12, 1, 2, 1)
 ## Tominaga1979 (Tahata2016)
 freq3 <- c(374, 602, 170, 64, 18, 255, 139, 71, 4, 23, 42, 55, 2, 6, 17, 53) 
 
-## Smith2006 (Tahata-Sudo-Arimoto)
+## Smith2006, cross-classification of GSS (Tahata-Sudo-Arimoto)
 freq4 <- c(98, 150, 135, 53, 37, 131, 133, 43, 9, 16, 33, 15, 4, 1, 4, 21)
 
 
@@ -207,6 +207,6 @@ model <- function(freq) {
     G2 <- append(G2, round(i$deviance, digits=3))
   }
   result <- data.frame(model=names(m), df=df, G2=G2)
-  for (i in 1:(NI-1)) result <- rbind(result, list(paste0('ME',i), '', round(ans_MEk[i], digits=3)))
+  for (i in 1:(NI-1)) result <- rbind(result, list(paste0('ME',i), i, round(ans_MEk[i], digits=3)))
   return (result)
 }
