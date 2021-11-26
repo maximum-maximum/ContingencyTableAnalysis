@@ -115,6 +115,23 @@ model <- function(freq) {
   }
   
   
+  ### LSIk
+  ff <- c()
+  for (i in 1:(NI-1)) {
+    ff <- cbind(ff, f[[i]])
+    assign(paste0('array_lsi', i), cbind(array1, ff))  
+  }
+  
+  
+  ### LSUk
+  ff <- c()
+  for (i in 1:(NI-1)) {
+    ff <- cbind(ff, f[[i]])
+    assign(paste0('array_lsu', i), cbind(array1, ff, array2)) 
+  }
+  
+  
+  
   ##### show results #####
   m <- list()
   m <- append(m, list(SI=glm(freq~array_si, family=poisson, data=sample)))
@@ -130,6 +147,16 @@ model <- function(freq) {
   for (i in 1:(NI-1)) {
     m <- append(m, list(glm(as.formula(paste0('freq~array_lsqu', i)), family=poisson, data=sample)))
     names(m)[length(m)] <- paste0('LSQU', i)  
+  }
+  
+  for (i in 1:(NI-1)) {
+    m <- append(m, list(glm(as.formula(paste0('freq~array_lsi', i)), family=poisson, data=sample)))
+    names(m)[length(m)] <- paste0('LSI', i)
+  }
+  
+  for (i in 1:(NI-1)) {
+    m <- append(m, list(glm(as.formula(paste0('freq~array_lsu', i)), family=poisson, data=sample)))
+    names(m)[length(m)] <- paste0('LSU', i)  
   }
   
   # m <- append(m, list(LSQUk_ver1 = glm(freq~array_si+f[[1]]+theta_lsquk+array_psi, family=poisson, data=sample)))
