@@ -103,22 +103,6 @@ model <- function(freq) {
   }
   
   
-  ### LSQIk
-  ff <- c()
-  for (i in 1:(NI-1)) {
-    ff <- cbind(ff, f[[i]])
-    assign(paste0('array_lsqi', i), cbind(array1, ff, array4))  
-  }
-  
-  
-  ### LSQUk
-  ff <- c()
-  for (i in 1:(NI-1)) {
-    ff <- cbind(ff, f[[i]])
-    assign(paste0('array_lsqu', i), cbind(array1, ff, array4, array2star)) 
-  }
-  
-  
   ### LSIk
   ff <- c()
   for (i in 1:(NI-1)) {
@@ -132,6 +116,22 @@ model <- function(freq) {
   for (i in 1:(NI-1)) {
     ff <- cbind(ff, f[[i]])
     assign(paste0('array_lsu', i), cbind(array1, ff, array2)) 
+  }
+  
+  
+  ### LSQIk
+  ff <- c()
+  for (i in 1:(NI-1)) {
+    ff <- cbind(ff, f[[i]])
+    assign(paste0('array_lsqi', i), cbind(array1, ff, array4))  
+  }
+  
+  
+  ### LSQUk
+  ff <- c()
+  for (i in 1:(NI-1)) {
+    ff <- cbind(ff, f[[i]])
+    assign(paste0('array_lsqu', i), cbind(array1, ff, array4, array2star)) 
   }
   
   
@@ -172,6 +172,16 @@ model <- function(freq) {
   m <- append(m, list(S=glm(freq~s, family=poisson, data=sample)))
 
   for (i in 1:(NI-1)) {
+    m <- append(m, list(glm(as.formula(paste0('freq~array_lsi', i)), family=poisson, data=sample)))
+    names(m)[length(m)] <- paste0('LSI', i)
+  }
+  
+  for (i in 1:(NI-1)) {
+    m <- append(m, list(glm(as.formula(paste0('freq~array_lsu', i)), family=poisson, data=sample)))
+    names(m)[length(m)] <- paste0('LSU', i)  
+  }
+  
+  for (i in 1:(NI-1)) {
     m <- append(m, list(glm(as.formula(paste0('freq~array_lsqi', i)), family=poisson, data=sample)))
     names(m)[length(m)] <- paste0('LSQI', i)
   }
@@ -181,16 +191,6 @@ model <- function(freq) {
     names(m)[length(m)] <- paste0('LSQU', i)  
   }
   
-  for (i in 1:(NI-1)) {
-    m <- append(m, list(glm(as.formula(paste0('freq~array_lsi', i)), family=poisson, data=sample)))
-    names(m)[length(m)] <- paste0('LSI', i)
-  }
-  
-  for (i in 1:(NI-1)) {
-    m <- append(m, list(glm(as.formula(paste0('freq~array_lsu', i)), family=poisson, data=sample)))
-    names(m)[length(m)] <- paste0('LSU', i)  
-  }
-
   
   # m <- append(m, list(LSQUk_ver1 = glm(freq~array_si+f[[1]]+theta_lsquk+array_psi, family=poisson, data=sample)))
   # m <- append(m, list(LSQUk_ver1 = glm(freq~array_si+f[[2]]+theta_lsquk+array_psi, family=poisson, data=sample)))
