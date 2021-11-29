@@ -191,22 +191,15 @@ model <- function(freq) {
     names(m)[length(m)] <- paste0('LSQU', i)  
   }
   
-  
-  # m <- append(m, list(LSQUk_ver1 = glm(freq~array_si+f[[1]]+theta_lsquk+array_psi, family=poisson, data=sample)))
-  # m <- append(m, list(LSQUk_ver1 = glm(freq~array_si+f[[2]]+theta_lsquk+array_psi, family=poisson, data=sample)))
-  # m <- append(m, list(LSQUk_ver1 = glm(freq~array_si+f[[3]]+theta_lsquk+array_psi, family=poisson, data=sample)))
-  
-  # m <- append(m, list(LSQUk_ver2 = glm(freq~cs+f2[[1]]+theta, family=poisson, data=sample)))
-  # m <- append(m, list(LSQUk_ver2 = glm(freq~cs+f2[[2]]+theta, family=poisson, data=sample)))
-  # m <- append(m, list(LSQUk_ver2 = glm(freq~cs+f2[[3]]+theta, family=poisson, data=sample)))
-
-
-  df <- G2 <- c()
+  df <- G2 <- AIC <- Pvalue <- c()
   for (i in m) {
     df <- append(df, i$df.residual)
     G2 <- append(G2, round(i$deviance, digits=3))
+    AIC <- append(AIC, round(i$aic, digits=3))
+    anova <- anova(i, test="LRT")
+    Pvalue <- append(Pvalue, anova$`Pr(>Chi)`[2])
   }
-  result <- data.frame(model=names(m), df=df, G2=G2)
-  for (i in 1:(NI-1)) result <- rbind(result, list(paste0('ME',i), i, round(ans_MEk[i], digits=3)))
+  result <- data.frame(model=names(m), df=df, G2=G2, AIC=AIC, Pvalue=Pvalue)
+  for (i in 1:(NI-1)) result <- rbind(result, list(paste0('ME',i), i, round(ans_MEk[i], digits=3), '', ''))
   return (result)
 }
