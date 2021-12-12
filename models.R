@@ -191,15 +191,20 @@ model <- function(freq) {
     names(m)[length(m)] <- paste0('LSQU', i)  
   }
   
-  df <- G2 <- AIC <- Pvalue <- c()
+  df <- G2 <- AIC <- Pvalue <- code <- c()
+  signif.code <- ''
   for (i in m) {
     df <- append(df, i$df.residual)
     G2 <- append(G2, round(i$deviance, digits=3))
     AIC <- append(AIC, round(i$aic, digits=3))
-    anova <- anova(i, test="LRT")
-    Pvalue <- append(Pvalue, anova$`Pr(>Chi)`[2])
+    Pvalue <- append(Pvalue, round(1-pchisq(i$deviance, i$df.residual), digits=4))
+    p <- round(1-pchisq(i$deviance, i$df.residual), digits=4)
+    if (p < 0.05) signif.code <- paste0(signif.code, "*") 
+    if (p < 0.01) signif.code <- paste0(signif.code, "*") 
+    if (p < 0.001) signif.code <- paste0(signif.code, "*") 
+    code <- append(code, signif.code)
   }
-  result <- data.frame(model=names(m), df=df, G2=G2, AIC=AIC, Pvalue=Pvalue)
-  for (i in 1:(NI-1)) result <- rbind(result, list(paste0('ME',i), i, round(ans_MEk[i], digits=3), '', ''))
+  result <- data.frame(model=names(m), df=df, G2=G2, AIC=AIC, Pvalue=Pvalue, code=code)
+  for (i in 1:(NI-1)) result <- rbind(result, list(paste0('ME',i), i, round(ans_MEk[i], digits=3), '', '', ''))
   return (result)
 }
