@@ -205,5 +205,7 @@ model <- function(freq) {
   for (i in 1:(NI-1)) {
     result <- rbind(result, list(paste0('ME',i), i, round(ans_MEk[i], digits=3), '', '', ''))
   }  
-  return (result)
+  print(result)
+  cat("-----\n")
+  cat("Signif. codes:  0  '***'  0.001  '**'  0.01  '*'  0.05")
 }
