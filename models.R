@@ -16,7 +16,7 @@ freq3 <- c(374, 602, 170, 64, 18, 255, 139, 71, 4, 23, 42, 55, 2, 6, 17, 53)
 ## Smith2006, cross-classification of GSS (Tahata-Sudo-Arimoto)
 freq4 <- c(98, 150, 135, 53, 37, 131, 133, 43, 9, 16, 33, 15, 4, 1, 4, 21)
 
-
+hoge <- list()
 
 model <- function(freq) {
   NI <- ifelse(floor(sqrt(length(freq))) < ceiling(sqrt(length(freq))), stop(), sqrt(length(freq)))
@@ -205,7 +205,19 @@ model <- function(freq) {
   for (i in 1:(NI-1)) {
     result <- rbind(result, list(paste0('ME',i), i, round(ans_MEk[i], digits=3), '', '', ''))
   }  
+  hoge <<- m
+  cat("\n")
   print(result)
   cat("-----\n")
-  cat("Signif. codes:  0  '***'  0.001  '**'  0.01  '*'  0.05")
+  cat("Signif. codes:  0  '***'  0.001  '**'  0.01  '*'  0.05  ''\n")
+}
+
+detail <- function(model) {
+  selectedModelResult <- hoge[[model]]
+  fittingValue <- round(fitted(selectedModelResult), 3)
+  resultMatrix <- t(matrix(paste0(freq,' (',fittingValue,')'),4,4))
+  
+  print(selectedModelResult)
+  cat('\n')
+  print(resultMatrix)
 }
