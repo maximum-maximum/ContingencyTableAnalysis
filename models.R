@@ -20,13 +20,14 @@ freq4 <- c(98, 150, 135, 53, 37, 131, 133, 43, 9, 16, 33, 15, 4, 1, 4, 21)
 
 ##### initailize global objects #####
 modelResults <- list()
+inputData <- c()
 r <- 0
 
 
 
 model <- function(freq) {
   r <<- ifelse(floor(sqrt(length(freq))) < ceiling(sqrt(length(freq))), stop(), sqrt(length(freq)))
-
+  inputData <<- freq
 
   
   ##### define design matrices #####
@@ -221,7 +222,7 @@ model <- function(freq) {
 detail <- function(model) {
   selectedModelResult <- modelResults[[model]]
   fittingValue <- round(fitted(selectedModelResult), 3)
-  resultMatrix <- t(matrix(paste0(freq,' (',fittingValue,')'),r,r))
+  resultMatrix <- t(matrix(paste0(inputData,' (',fittingValue,')'),r,r))
   
   print(summary(selectedModelResult))
   cat('Data:\n')
