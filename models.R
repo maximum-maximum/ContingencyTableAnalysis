@@ -223,7 +223,8 @@ detail <- function(model) {
   fittingValue <- round(fitted(selectedModelResult), 3)
   resultMatrix <- t(matrix(paste0(freq,' (',fittingValue,')'),r,r))
   
-  print(selectedModelResult)
-  cat('\n')
+  print(summary(selectedModelResult))
+  cat('Data:\n')
   print(resultMatrix)
+  cat('(The parenthesized values are the MLEs of expected frequencies under the selected model)')
 }
