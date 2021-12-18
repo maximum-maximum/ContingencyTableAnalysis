@@ -141,30 +141,50 @@ model <- function(freq) {
   
   ### MEk
   library(Rsolnp)
-  ConstFunc_MEk = function(p){
+  constraintFunc = function(p){
     const <- c()
-    sum <- sum(p)
-    const <- append(const,sum-1)
-    l <- ifelse(length(solution_MEk)>=(r-1),length(solution_GGMk) + 1,length(solution_MEk) + 1)
-    for(k in 1:l) const <- append(const,sum((f[[k]])*p))
+    const <- append(const, sum(p)-1)
+    l <- ifelse(length(solnpList)>=(r-1),length(solnpList_GGMk) + 1,length(solnpList) + 1)
+    for(k in 1:l) const <- append(const,sum(f[[k]]*p))
     return(const)
   }
-  eq.valueMEk <- list()
-  for(i in 1:(r-1)) eq.valueMEk <- append(eq.valueMEk,list(rep(0,i+1)))
-  zero <- function(x) return (x[x>0])
-  ObjFunc = function(p) return(-sum(freq*log(p)))
-  saturated_model = function(freq) return(-sum(zero(freq)*log(zero(freq/sum(freq)))))
-  eq.LB <- rep(0,length(freq))
+  equationValue <- list()
+  for(i in 1:(r-1)) equationValue <- append(equationValue, list(rep(0,i+1)))
+  removeZero <- function(freq) return (freq[freq>0])
+  objectFunc <- function(p) return(-sum(freq*log(p)))
+  fullModel = function(freq) return(-sum(removeZero(freq)*log(removeZero(freq/sum(freq)))))
+  paramLowerBound <- rep(0, length(freq))
   p0 <- rep(1/length(freq), length(freq))
-  solution_MEk <- list()
+  solnpList <- list()
   for(i in 1:(r-1)){
-    solution_MEk <- append(solution_MEk, list(solnp(p0, fun=ObjFunc, eqfun=ConstFunc_MEk, eqB=eq.valueMEk[[i]], LB=eq.LB)))
+    solnp <- solnp(p0, fun=objectFunc, eqfun=constraintFunc, eqB=equationValue[[i]], LB=paramLowerBound)
+    solnpList <- append(solnpList, list(solnp))
   }
-  ans_MEk <- c()
+  MEkG2 <- MEkAIC <- c()
   for(i in 1:(r-1)){
-    ans_MEk <- append(ans_MEk, -2*(saturated_model(freq) - solution_MEk[[i]]$value[length(solution_MEk[[i]]$value)]))
+    MEkG2 <- append(MEkG2, -2*(fullModel(freq) - solnpList[[i]]$value[length(solnpList[[i]]$value)]))
+    MEkAIC <- append(MEkAIC, -2*(fullModel(freq) - solnpList[[i]]$value[length(solnpList[[i]]$value)]))
   }
   
+  
+  #objectFunc = function(p) return(-sum(freq*log(p)))
+  # constraintFunc = function(p){
+  #   MEkConstraintsList <- c()
+  #   MEkConstraintsList <- append(MEkConstraintsList, sum(p)-1)
+  #   l <- r-1
+  #   constraintsList <- list()
+  #   for (k in 1:l) {
+  #     tmp <- c()
+  #     for (i in 1:r) {
+  #       for (j in 1:r) {
+  #         tmp <- c(tmp, i^k-j^k)
+  #       }
+  #     }
+  #     constraintsList[[k]] <- tmp
+  #     MEkConstraintsList <- append(MEkConstraintsList, sum(tmp*p))
+  #   }
+  #   return(MEkConstraintsList)
+  # }
   
   
   ##### show results #####
@@ -197,20 +217,21 @@ model <- function(freq) {
   
   df <- G2 <- AIC <- Pvalue <- code <- c()
   for (i in m) {
-    df <- append(df, i$df.residual)
-    G2 <- append(G2, round(i$deviance, digits=3))
-    AIC <- append(AIC, round(i$aic, digits=3))
-    p <- round(1-pchisq(i$deviance, i$df.residual), digits=4)
-    Pvalue <- append(Pvalue, p)
+    p <- round(1 - pchisq(i$deviance, i$df.residual), digits=4)
     signif.code <- ''
     for (alpha in c(0.05, 0.01, 0.001)) {
       if (p < alpha) signif.code <- paste0(signif.code, "*")   
     }
+    
+    df <- append(df, i$df.residual)
+    G2 <- append(G2, round(i$deviance, digits=3))
+    AIC <- append(AIC, round(i$aic, digits=3))
+    Pvalue <- append(Pvalue, p)
     code <- append(code, signif.code)
   }
   result <- data.frame(model=names(m), df=df, G2=G2, AIC=AIC, Pvalue=Pvalue, code=code)
   for (i in 1:(r-1)) {
-    result <- rbind(result, list(paste0('ME',i), i, round(ans_MEk[i], digits=3), '', '', ''))
+    result <- rbind(result, list(paste0('ME',i), i, round(MEkG2[i], digits=3), '', '', ''))
   }  
   modelResults <<- m
   cat("\n")
