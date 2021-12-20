@@ -111,7 +111,7 @@ model <- function(freq) {
   ff <- c()
   for (i in 1:(r-1)) {
     ff <- cbind(ff, f[[i]])
-    assign(paste0('arrayLSI', i), cbind(array1, ff))  
+    assign(paste0('arrayLSI', i), cbind(array1, ff))
   }
   
   
@@ -119,7 +119,7 @@ model <- function(freq) {
   ff <- c()
   for (i in 1:(r-1)) {
     ff <- cbind(ff, f[[i]])
-    assign(paste0('arrayLSU', i), cbind(array1, ff, array2)) 
+    assign(paste0('arrayLSU', i), cbind(array1, ff, array2))
   }
   
   
@@ -127,7 +127,7 @@ model <- function(freq) {
   ff <- c()
   for (i in 1:(r-1)) {
     ff <- cbind(ff, f[[i]])
-    assign(paste0('arrayLSQI', i), cbind(array1, ff, array4))  
+    assign(paste0('arrayLSQI', i), cbind(array1, ff, array4))
   }
   
   
@@ -135,7 +135,7 @@ model <- function(freq) {
   ff <- c()
   for (i in 1:(r-1)) {
     ff <- cbind(ff, f[[i]])
-    assign(paste0('arrayLSQU', i), cbind(array1, ff, array4, array2star)) 
+    assign(paste0('arrayLSQU', i), cbind(array1, ff, array4, array2star))
   }
   
   
@@ -201,7 +201,7 @@ model <- function(freq) {
     }
   }
   
-  for (i in 1:(r-1)) {
+  for (i in (r-1):1) {
     G2 <- -2*(fullModel(freq) - solnpList[[i]]$value[length(solnpList[[i]]$value)])
     maxLogLikeli <- constMolecule - constDenominator + (-solnpList[[i]]$value[length(solnpList[[i]]$value)])
     AIC <- -2*maxLogLikeli + 2*i
@@ -218,7 +218,7 @@ model <- function(freq) {
     p <- round(1 - pchisq(i$deviance, i$df.residual), 4)
     signif.code <- ''
     for (alpha in c(0.05, 0.01, 0.001)) {
-      if (p < alpha) signif.code <- paste0(signif.code, "*")   
+      if (p < alpha) signif.code <- paste0(signif.code, "*")
     }
     
     df <- append(df, i$df.residual)
@@ -242,7 +242,7 @@ model <- function(freq) {
 detail <- function(model) {
   selectedModelResult <- modelResults[[model]]
   fittingValue <- round(fitted(selectedModelResult), 3)
-  resultMatrix <- t(matrix(paste0(inputData,' (',fittingValue,')'),r,r))
+  resultMatrix <- t(matrix(paste0(inputData,' (',fittingValue,')'), r, r))
   
   print(summary(selectedModelResult))
   cat('Data:\n')
