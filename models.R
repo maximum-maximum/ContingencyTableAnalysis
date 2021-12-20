@@ -139,6 +139,27 @@ model <- function(freq) {
   }
   
   
+  
+  ##### analyze with each model #####
+  m <- list()
+  models <- c('SI', 'SU', 'SQI', 'SQU', 'S')
+  for (model in models) {
+    glm <- glm(as.formula(paste0('freq~array', model)), family=poisson, data=list(freq))
+    m <- append(m, list(glm))
+    names(m)[length(m)] <- model
+  }
+
+  
+  models <- c('LSI', 'LSU', 'LSQI', 'LSQU')
+  for (model in models) {
+    for (i in 1:(r-1)) {
+      glm <- glm(as.formula(paste0('freq~array', model, i)), family=poisson, data=list(freq))
+      m <- append(m, list(glm))
+      names(m)[length(m)] <- paste0(model, i)
+    }
+  }
+  
+  
   ### MEk
   library(Rsolnp)
   constraintFunc <- function(p){
@@ -167,6 +188,7 @@ model <- function(freq) {
   solnpList <- list()
   for (i in 1:(r-1)) {
     solnp <- solnp(p0, fun=objectFunc, eqfun=constraintFunc, eqB=equationValue[[i]], LB=paramLowerBound)
+    # print(solnp)
     solnpList <- append(solnpList, list(solnp))
   }
   MEkG2 <- MEkAIC <- c()
@@ -180,27 +202,6 @@ model <- function(freq) {
   }
   
   
-  
-  ##### analyze with each model #####
-  m <- list()
-  models <- c('SI', 'SU', 'SQI', 'SQU', 'S')
-  for (model in models) {
-    glm <- glm(as.formula(paste0('freq~array', model)), family=poisson, data=list(freq))
-    m <- append(m, list(glm))
-    names(m)[length(m)] <- model
-  }
-
-  models <- c('LSI', 'LSU', 'LSQI', 'LSQU')
-  for (model in models) {
-    for (i in 1:(r-1)) {
-      glm <- glm(as.formula(paste0('freq~array', model, i)), family=poisson, data=list(freq))
-      m <- append(m, list(glm))
-      names(m)[length(m)] <- paste0(model, i)
-    }
-  }
-  
-  
-
   
   ##### show results #####
   df <- G2 <- AIC <- Pvalue <- code <- c()
