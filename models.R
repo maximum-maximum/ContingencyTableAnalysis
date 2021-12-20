@@ -191,20 +191,19 @@ model <- function(freq) {
     # print(solnp)
     solnpList <- append(solnpList, list(solnp))
   }
-  MEkG2 <- MEkAIC <- c()
   for (i in 1:(r-1)) {
     G2 <- -2*(fullModel(freq) - solnpList[[i]]$value[length(solnpList[[i]]$value)])
     maxLogLikeli <- log(gamma(sum(freq)+1)) - sum(log(gamma(freq+1))) + (-solnpList[[i]]$value[length(solnpList[[i]]$value)])
     AIC <- -2*maxLogLikeli + 2*i
     
-    MEkG2 <- append(MEkG2, G2)
-    MEkAIC <- append(MEkAIC, AIC)
+    m <- append(m, list(list(deviance=G2, df.residual=i, aic=AIC)))
+    names(m)[length(m)] <- paste0('ME', i)
   }
   
   
   
   ##### show results #####
-  df <- G2 <- AIC <- Pvalue <- code <- c()
+  df <- G2 <- AIC <- pValue <- code <- c()
   for (i in m) {
     p <- round(1 - pchisq(i$deviance, i$df.residual), 4)
     signif.code <- ''
@@ -215,27 +214,16 @@ model <- function(freq) {
     df <- append(df, i$df.residual)
     G2 <- append(G2, round(i$deviance, 3))
     AIC <- append(AIC, round(i$aic, 3))
-    Pvalue <- append(Pvalue, p)
+    pValue <- append(pValue, p)
     code <- append(code, signif.code)
   }
-  result <- data.frame(model=names(m), df=df, G2=G2, AIC=AIC, Pvalue=Pvalue, code=code)
+  result <- data.frame(model=names(m), df=df, G2=G2, AIC=AIC, pValue=pValue, code=code)
+  names(result)[5] <- "Pr(>G2)"
   
-  for (i in 1:(r-1)) {
-    G2 <- round(MEkG2[i], 3)
-    AIC <- round(MEkAIC[i], 3)
-    p <- round(1 - pchisq(G2, i), 4)
-    
-    signif.code <- ''
-    for (alpha in c(0.05, 0.01, 0.001)) {
-      if (p < alpha) signif.code <- paste0(signif.code, "*")   
-    }
-    
-    result <- rbind(result, list(paste0('ME',i), i, G2, AIC, p, signif.code))
-  }  
   modelResults <<- m
   cat("\n")
   print(result)
-  cat("-----\n")
+  cat("---\n")
   cat("Signif. codes:  0  '***'  0.001  '**'  0.01  '*'  0.05  ''\n")
 }
 
