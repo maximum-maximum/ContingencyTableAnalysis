@@ -191,9 +191,19 @@ model <- function(freq) {
     # print(solnp)
     solnpList <- append(solnpList, list(solnp))
   }
+  
+  constMolecule <- 0
+  constDenominator <- 0
+  for (i in 1:sum(freq)) constMolecule <- constMolecule + log(i)
+  for (i in removeZero(freq)) {
+    for (j in 1:i) {
+      constDenominator <- constDenominator + log(j)
+    }
+  }
+  
   for (i in 1:(r-1)) {
     G2 <- -2*(fullModel(freq) - solnpList[[i]]$value[length(solnpList[[i]]$value)])
-    maxLogLikeli <- log(gamma(sum(freq)+1)) - sum(log(gamma(freq+1))) + (-solnpList[[i]]$value[length(solnpList[[i]]$value)])
+    maxLogLikeli <- constMolecule - constDenominator + (-solnpList[[i]]$value[length(solnpList[[i]]$value)])
     AIC <- -2*maxLogLikeli + 2*i
     
     m <- append(m, list(list(deviance=G2, df.residual=i, aic=AIC)))
