@@ -75,34 +75,34 @@ model <- function(freq) {
   
   ##### bind matrices #####
   ### SI 
-  array_si <- array1
+  arraySI <- array1
   
   
   ### SU 
-  array_su <- cbind(array1, array2)
+  arraySU <- cbind(array1, array2)
 
 
   ### SQI
-  array_sqi <- cbind(array1, array4)
+  arraySQI <- cbind(array1, array4)
   
   
   ### SQU
-  array_squ <- cbind(array1, array4, array2star)
+  arraySQU <- cbind(array1, array4, array2star)
   
   
   ### S
-  array_s <- array(0, dim=c(1,r,r))
-  s <- c()
+  s <- array(0, dim=c(1,r,r))
+  arrayS <- c()
   for (i in 1:r) {
     for (j in 1:r) {
       if (i == j) {
-        array_s[1, i, j] <- 1
-        s <- cbind(s, c(array_s[1,,]))
+        s[1, i, j] <- 1
+        arrayS <- cbind(arrayS, c(s[1,,]))
       } else if (i < j) {
-        array_s[1, i, j] <- array_s[1, j, i] <- 1
-        s <- cbind(s, c(array_s[1,,]))
+        s[1, i, j] <- s[1, j, i] <- 1
+        arrayS <- cbind(arrayS, c(s[1,,]))
       }
-      array_s <- array(0, dim=c(1,r,r))
+      s <- array(0, dim=c(1,r,r))
     }
   }
   
@@ -111,7 +111,7 @@ model <- function(freq) {
   ff <- c()
   for (i in 1:(r-1)) {
     ff <- cbind(ff, f[[i]])
-    assign(paste0('array_lsi', i), cbind(array1, ff))  
+    assign(paste0('arrayLSI', i), cbind(array1, ff))  
   }
   
   
@@ -119,7 +119,7 @@ model <- function(freq) {
   ff <- c()
   for (i in 1:(r-1)) {
     ff <- cbind(ff, f[[i]])
-    assign(paste0('array_lsu', i), cbind(array1, ff, array2)) 
+    assign(paste0('arrayLSU', i), cbind(array1, ff, array2)) 
   }
   
   
@@ -127,7 +127,7 @@ model <- function(freq) {
   ff <- c()
   for (i in 1:(r-1)) {
     ff <- cbind(ff, f[[i]])
-    assign(paste0('array_lsqi', i), cbind(array1, ff, array4))  
+    assign(paste0('arrayLSQI', i), cbind(array1, ff, array4))  
   }
   
   
@@ -135,7 +135,7 @@ model <- function(freq) {
   ff <- c()
   for (i in 1:(r-1)) {
     ff <- cbind(ff, f[[i]])
-    assign(paste0('array_lsqu', i), cbind(array1, ff, array4, array2star)) 
+    assign(paste0('arrayLSQU', i), cbind(array1, ff, array4, array2star)) 
   }
   
   
@@ -158,54 +158,49 @@ model <- function(freq) {
     return(MEkConstraints)
   }
   equationValue <- list()
-  for(i in 1:(r-1)) equationValue <- append(equationValue, list(rep(0, i+1)))
-  removeZero <- function(freq) return (freq[freq > 0])
+  for (i in 1:(r-1)) equationValue <- append(equationValue, list(rep(0, i+1)))
+  removeZero <- function(freq) return(freq[freq > 0])
   objectFunc <- function(p) return(-sum(freq*log(p)))
   fullModel <- function(freq) return(-sum(removeZero(freq)*log(removeZero(freq/sum(freq)))))
   paramLowerBound <- rep(0, length(freq))
   p0 <- rep(1/length(freq), length(freq))
   solnpList <- list()
-  for(i in 1:(r-1)){
+  for (i in 1:(r-1)) {
     solnp <- solnp(p0, fun=objectFunc, eqfun=constraintFunc, eqB=equationValue[[i]], LB=paramLowerBound)
     solnpList <- append(solnpList, list(solnp))
   }
   MEkG2 <- MEkAIC <- c()
-  for(i in 1:(r-1)){
-    MEkG2 <- append(MEkG2, -2*(fullModel(freq) - solnpList[[i]]$value[length(solnpList[[i]]$value)]))
-    MEkAIC <- append(MEkAIC, 2*solnpList[[i]]$value[length(solnpList[[i]]$value)] + 2*i)
+  for (i in 1:(r-1)) {
+    G2 <- -2*(fullModel(freq) - solnpList[[i]]$value[length(solnpList[[i]]$value)])
+    maxLogLikeli <- log(gamma(sum(freq)+1)) - sum(log(gamma(freq+1))) + (-solnpList[[i]]$value[length(solnpList[[i]]$value)])
+    AIC <- -2*maxLogLikeli + 2*i
+    
+    MEkG2 <- append(MEkG2, G2)
+    MEkAIC <- append(MEkAIC, AIC)
   }
   
   
   
   ##### analyze with each model #####
   m <- list()
-  m <- append(m, list(SI=glm(freq~array_si, family=poisson, data=list(freq))))
-  m <- append(m, list(SU=glm(freq~array_su, family=poisson, data=list(freq))))
-  m <- append(m, list(SQI=glm(freq~array_sqi, family=poisson, data=list(freq))))
-  m <- append(m, list(SQU=glm(freq~array_squ, family=poisson, data=list(freq))))
-  m <- append(m, list(S=glm(freq~s, family=poisson, data=list(freq))))
-
-  for (i in 1:(r-1)) {
-    m <- append(m, list(glm(as.formula(paste0('freq~array_lsi', i)), family=poisson, data=list(freq))))
-    names(m)[length(m)] <- paste0('LSI', i)
-  }
-  
-  for (i in 1:(r-1)) {
-    m <- append(m, list(glm(as.formula(paste0('freq~array_lsu', i)), family=poisson, data=list(freq))))
-    names(m)[length(m)] <- paste0('LSU', i)  
-  }
-  
-  for (i in 1:(r-1)) {
-    m <- append(m, list(glm(as.formula(paste0('freq~array_lsqi', i)), family=poisson, data=list(freq))))
-    names(m)[length(m)] <- paste0('LSQI', i)
+  models <- c('SI', 'SU', 'SQI', 'SQU', 'S')
+  for (model in models) {
+    glm <- glm(as.formula(paste0('freq~array', model)), family=poisson, data=list(freq))
+    m <- append(m, list(glm))
+    names(m)[length(m)] <- model
   }
 
-  for (i in 1:(r-1)) {
-    m <- append(m, list(glm(as.formula(paste0('freq~array_lsqu', i)), family=poisson, data=list(freq))))
-    names(m)[length(m)] <- paste0('LSQU', i)  
+  models <- c('LSI', 'LSU', 'LSQI', 'LSQU')
+  for (model in models) {
+    for (i in 1:(r-1)) {
+      glm <- glm(as.formula(paste0('freq~array', model, i)), family=poisson, data=list(freq))
+      m <- append(m, list(glm))
+      names(m)[length(m)] <- paste0(model, i)
+    }
   }
   
   
+
   
   ##### show results #####
   df <- G2 <- AIC <- Pvalue <- code <- c()
@@ -242,6 +237,8 @@ model <- function(freq) {
   cat("-----\n")
   cat("Signif. codes:  0  '***'  0.001  '**'  0.01  '*'  0.05  ''\n")
 }
+
+
 
 detail <- function(model) {
   selectedModelResult <- modelResults[[model]]
