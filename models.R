@@ -247,11 +247,13 @@ model <- function(freq) {
 
 detail <- function(model) {
   selectedModelResult <- globalAnalysResults[[model]]
-  fittingValue <- round(fitted(selectedModelResult), 3)
-  resultMatrix <- t(matrix(paste0(inputData," (",fittingValue,")"), r, r))
-  
-  print(summary(selectedModelResult))
-  cat("Data:\n")
-  print(resultMatrix)
-  cat("The parenthesized values are the MLEs of expected frequencies under the selected model)")
+  if (length(selectedModelResult) == 30) {
+    fittingValue <- round(fitted(selectedModelResult), 3)
+    resultMatrix <- t(matrix(paste0(inputData," (",fittingValue,")"), r, r))
+    
+    print(summary(selectedModelResult))
+    cat("Data:\n")
+    print(resultMatrix)
+  } else print(selectedModelResult)
+  cat("(The parenthesized values are the MLEs of expected frequencies under the selected model)")
 }
