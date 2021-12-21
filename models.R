@@ -161,7 +161,8 @@ model <- function(freq) {
   
   
   ### MEk
-  library(Rsolnp)
+  #library(Rsolnp)
+  source("solnp.R")
   constraintFunc <- function(p){
     MEkConstraints <- c()
     MEkConstraints <- append(MEkConstraints, sum(p)-1)

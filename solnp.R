@@ -331,11 +331,11 @@ solnp = function(pars, fun, eqfun = NULL, eqB = NULL, ineqfun = NULL, ineqLB = N
 	} else{
 		if( .vnorm( c(tt[ 1 ], tt[ 2 ]) ) <= tol ) {
 			convergence = 0
-			if( trace ) cat( paste( "\nsolnp--> Completed in ", .solnp_iter, " iterations\n", sep="" ) )
+			# if( trace ) cat( paste( "\nsolnp--> Completed in ", .solnp_iter, " iterations\n", sep="" ) )
 		} else{
 			convergence = 1
-			if( trace ) cat( paste( "\nsolnp--> Exiting after maximum number of iterations\n",
-							"Tolerance not achieved\n", sep="" ) )
+			# if( trace ) cat( paste( "\nsolnp--> Exiting after maximum number of iterations\n",
+							# "Tolerance not achieved\n", sep="" ) )
 		}
 	}
 	# end timer
@@ -1126,8 +1126,8 @@ solnp = function(pars, fun, eqfun = NULL, eqB = NULL, ineqfun = NULL, ineqLB = N
 # reporting function
 .report = function(iter, funv, pars)
 {
-	cat( paste( "\nIter: ", iter ," fn: ", format(funv, digits = 4, scientific = 5, nsmall = 4, zero.print = TRUE), "\t Pars: ", sep=""), 
-			format(pars, digits = 4, scientific = 6, nsmall = 5, zero.print = TRUE) )
+	# cat( paste( "\nIter: ", iter ," fn: ", format(funv, digits = 4, scientific = 5, nsmall = 4, zero.print = TRUE), "\t Pars: ", sep=""), 
+			# format(pars, digits = 4, scientific = 6, nsmall = 5, zero.print = TRUE) )
 }
 
 # finite difference gradient
