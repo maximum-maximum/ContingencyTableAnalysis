@@ -111,7 +111,7 @@ model <- function(freq) {
   ff <- c()
   for (i in 1:(r-1)) {
     ff <- cbind(ff, f[[i]])
-    assign(paste0('arrayLSI', i), cbind(array1, ff))
+    assign(paste0("arrayLSI", i), cbind(array1, ff))
   }
   
   
@@ -119,7 +119,7 @@ model <- function(freq) {
   ff <- c()
   for (i in 1:(r-1)) {
     ff <- cbind(ff, f[[i]])
-    assign(paste0('arrayLSU', i), cbind(array1, ff, array2))
+    assign(paste0("arrayLSU", i), cbind(array1, ff, array2))
   }
   
   
@@ -127,7 +127,7 @@ model <- function(freq) {
   ff <- c()
   for (i in 1:(r-1)) {
     ff <- cbind(ff, f[[i]])
-    assign(paste0('arrayLSQI', i), cbind(array1, ff, array4))
+    assign(paste0("arrayLSQI", i), cbind(array1, ff, array4))
   }
   
   
@@ -135,23 +135,23 @@ model <- function(freq) {
   ff <- c()
   for (i in 1:(r-1)) {
     ff <- cbind(ff, f[[i]])
-    assign(paste0('arrayLSQU', i), cbind(array1, ff, array4, array2star))
+    assign(paste0("arrayLSQU", i), cbind(array1, ff, array4, array2star))
   }
   
   
   
   ##### analyze with each model #####
   analysResults <- list()
-  models <- c('SI', 'SU', 'SQI', 'SQU', 'S', 'LSI', 'LSU', 'LSQI', 'LSQU')
+  models <- c("SI", "SU", "SQI", "SQU", "S", "LSI", "LSU", "LSQI", "LSQU")
   for (modelIndex in 1:length(models)) {
-    if (modelIndex <= which(models == 'S')) {
-      formula <- as.formula(paste0('freq~array', models[modelIndex]))
+    if (modelIndex <= which(models == "S")) {
+      formula <- as.formula(paste0("freq~array", models[modelIndex]))
       glm <- glm(formula, family=poisson, data=list(freq))
       analysResults <- append(analysResults, list(glm))
       names(analysResults)[length(analysResults)] <- models[modelIndex]
     } else {
       for (i in 1:(r-1)) {
-        formula <- as.formula(paste0('freq~array', models[modelIndex], i))
+        formula <- as.formula(paste0("freq~array", models[modelIndex], i))
         glm <- glm(formula, family=poisson, data=list(freq))
         analysResults <- append(analysResults, list(glm))
         names(analysResults)[length(analysResults)] <- paste0(models[modelIndex], i)
@@ -207,10 +207,10 @@ model <- function(freq) {
     AIC <- -2*maxLogLikeli + 2*i
     
     fittingValue <- round(sum(freq)*(solnpList[[i]]$pars), 3)
-    resultMatrix <- t(matrix(paste0(freq,' (',fittingValue,')'), r, r))
+    resultMatrix <- t(matrix(paste0(freq," (",fittingValue,")"), r, r))
     
     analysResults <- append(analysResults, list(list(deviance=G2, df.residual=i, aic=AIC, result=resultMatrix)))
-    names(analysResults)[length(analysResults)] <- paste0('ME', i)
+    names(analysResults)[length(analysResults)] <- paste0("ME", i)
   }
   
   
@@ -220,9 +220,12 @@ model <- function(freq) {
   for (model in analysResults) {
     p <- round(1 - pchisq(model$deviance, model$df.residual), 4)
     signif.code <- ''
-    for (alpha in c(0.05, 0.01, 0.001)) {
-      if (p < alpha) signif.code <- paste0(signif.code, "*")
-    }
+    if (p>0.05 && p<0.1) signif.code <- "."
+    else {
+      for (alpha in c(0.05, 0.01, 0.001)) {
+        if (p < alpha) signif.code <- paste0(signif.code, "*")
+      }
+    }  
     
     df <- append(df, model$df.residual)
     G2 <- append(G2, round(model$deviance, 3))
@@ -237,7 +240,7 @@ model <- function(freq) {
   cat("\n")
   print(resultForDisplay)
   cat("---\n")
-  cat("Signif. codes:  0  '***'  0.001  '**'  0.01  '*'  0.05  ''\n")
+  cat("Signif. codes:  0  '***'  0.001  '**'  0.01  '*'  0.05  '.'  0.1  ''  1\n")
 }
 
 
@@ -245,10 +248,10 @@ model <- function(freq) {
 detail <- function(model) {
   selectedModelResult <- globalAnalysResults[[model]]
   fittingValue <- round(fitted(selectedModelResult), 3)
-  resultMatrix <- t(matrix(paste0(inputData,' (',fittingValue,')'), r, r))
+  resultMatrix <- t(matrix(paste0(inputData," (",fittingValue,")"), r, r))
   
   print(summary(selectedModelResult))
-  cat('Data:\n')
+  cat("Data:\n")
   print(resultMatrix)
-  cat('(The parenthesized values are the MLEs of expected frequencies under the selected model)')
+  cat("The parenthesized values are the MLEs of expected frequencies under the selected model)")
 }
