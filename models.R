@@ -137,12 +137,19 @@ model <- function(freq, sort=FALSE) {
     ff <- cbind(ff, f[[i]])
     assign(paste0("arrayLSQU", i), cbind(array1, ff, array4, array2star))
   }
+
+
+  ### LSk
+  ff <- c()
+  for (i in 1:(r-1)) {
+    ff <- cbind(ff, f[[i]])
+    assign(paste0("arrayLS", i), cbind(arrayS, ff))
+  }
   
-  
-  
+
   ##### analyze with each model #####
   analysResults <- list()
-  models <- c("SI", "SU", "SQI", "SQU", "S", "LSI", "LSU", "LSQI", "LSQU")
+  models <- c("SI", "SU", "SQI", "SQU", "S", "LSI", "LSU", "LSQI", "LSQU", "LS")
   for (modelIndex in 1:length(models)) {
     if (modelIndex <= which(models == "S")) {
       formula <- as.formula(paste0("freq~array", models[modelIndex]))
@@ -161,8 +168,8 @@ model <- function(freq, sort=FALSE) {
   
   
   ### MEk
-  #library(Rsolnp)
-  source("solnp.R")
+  library(Rsolnp)
+  #source("solnp.R")
   constraintFunc <- function(p){
     MEkConstraints <- c()
     MEkConstraints <- append(MEkConstraints, sum(p)-1)
@@ -189,7 +196,6 @@ model <- function(freq, sort=FALSE) {
   solnpList <- list()
   for (i in 1:(r-1)) {
     solnp <- solnp(p0, fun=objectFunc, eqfun=constraintFunc, eqB=equationValue[[i]], LB=paramLowerBound)
-    # print(solnp)
     solnpList <- append(solnpList, list(solnp))
   }
   
@@ -244,7 +250,7 @@ model <- function(freq, sort=FALSE) {
   else print(resultForDisplay)
   
   cat("---\n")
-  cat("Signif. codes:  0  '***'  0.001  '**'  0.01  '*'  0.05  '.'  0.1  ''  1\n")
+  cat("Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1\n")
 }
 
 
