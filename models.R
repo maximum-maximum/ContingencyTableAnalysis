@@ -19,7 +19,7 @@ freq4 <- c(98, 150, 135, 53, 37, 131, 133, 43, 9, 16, 33, 15, 4, 1, 4, 21)
 
 
 ##### initailize global objects #####
-modelResults <- list()
+globalAnalysResults <- list()
 inputData <- c()
 r <- 0
 
@@ -141,20 +141,20 @@ model <- function(freq) {
   
   
   ##### analyze with each model #####
-  m <- list()
+  analysResults <- list()
   models <- c('SI', 'SU', 'SQI', 'SQU', 'S', 'LSI', 'LSU', 'LSQI', 'LSQU')
   for (modelIndex in 1:length(models)) {
     if (modelIndex <= which(models == 'S')) {
       formula <- as.formula(paste0('freq~array', models[modelIndex]))
       glm <- glm(formula, family=poisson, data=list(freq))
-      m <- append(m, list(glm))
-      names(m)[length(m)] <- models[modelIndex]
+      analysResults <- append(analysResults, list(glm))
+      names(analysResults)[length(analysResults)] <- models[modelIndex]
     } else {
       for (i in 1:(r-1)) {
         formula <- as.formula(paste0('freq~array', models[modelIndex], i))
         glm <- glm(formula, family=poisson, data=list(freq))
-        m <- append(m, list(glm))
-        names(m)[length(m)] <- paste0(models[modelIndex], i)
+        analysResults <- append(analysResults, list(glm))
+        names(analysResults)[length(analysResults)] <- paste0(models[modelIndex], i)
       }
     }
   }
@@ -206,33 +206,33 @@ model <- function(freq) {
     maxLogLikeli <- constMolecule - constDenominator + (-solnpList[[i]]$value[length(solnpList[[i]]$value)])
     AIC <- -2*maxLogLikeli + 2*i
     
-    m <- append(m, list(list(deviance=G2, df.residual=i, aic=AIC)))
-    names(m)[length(m)] <- paste0('ME', i)
+    analysResults <- append(analysResults, list(list(deviance=G2, df.residual=i, aic=AIC)))
+    names(analysResults)[length(analysResults)] <- paste0('ME', i)
   }
   
   
   
   ##### show results #####
   df <- G2 <- AIC <- pValue <- code <- c()
-  for (i in m) {
-    p <- round(1 - pchisq(i$deviance, i$df.residual), 4)
+  for (model in analysResults) {
+    p <- round(1 - pchisq(model$deviance, model$df.residual), 4)
     signif.code <- ''
     for (alpha in c(0.05, 0.01, 0.001)) {
       if (p < alpha) signif.code <- paste0(signif.code, "*")
     }
     
-    df <- append(df, i$df.residual)
-    G2 <- append(G2, round(i$deviance, 3))
-    AIC <- append(AIC, round(i$aic, 3))
+    df <- append(df, model$df.residual)
+    G2 <- append(G2, round(model$deviance, 3))
+    AIC <- append(AIC, round(model$aic, 3))
     pValue <- append(pValue, p)
     code <- append(code, signif.code)
   }
-  result <- data.frame(model=names(m), df=df, G2=G2, AIC=AIC, pValue=pValue, code=code)
-  names(result)[5] <- "Pr(>G2)"
+  resultForDisplay <- data.frame(model=names(analysResults), df=df, G2=G2, AIC=AIC, pValue=pValue, code=code)
+  names(resultForDisplay)[5] <- "Pr(>G2)"
   
-  modelResults <<- m
+  globalAnalysResults <<- analysResults
   cat("\n")
-  print(result)
+  print(resultForDisplay)
   cat("---\n")
   cat("Signif. codes:  0  '***'  0.001  '**'  0.01  '*'  0.05  ''\n")
 }
@@ -240,7 +240,7 @@ model <- function(freq) {
 
 
 detail <- function(model) {
-  selectedModelResult <- modelResults[[model]]
+  selectedModelResult <- globalAnalysResults[[model]]
   fittingValue <- round(fitted(selectedModelResult), 3)
   resultMatrix <- t(matrix(paste0(inputData,' (',fittingValue,')'), r, r))
   
