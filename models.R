@@ -206,7 +206,10 @@ model <- function(freq) {
     maxLogLikeli <- constMolecule - constDenominator + (-solnpList[[i]]$value[length(solnpList[[i]]$value)])
     AIC <- -2*maxLogLikeli + 2*i
     
-    analysResults <- append(analysResults, list(list(deviance=G2, df.residual=i, aic=AIC)))
+    fittingValue <- round(sum(freq)*(solnpList[[i]]$pars), 3)
+    resultMatrix <- t(matrix(paste0(freq,' (',fittingValue,')'), r, r))
+    
+    analysResults <- append(analysResults, list(list(deviance=G2, df.residual=i, aic=AIC, result=resultMatrix)))
     names(analysResults)[length(analysResults)] <- paste0('ME', i)
   }
   
