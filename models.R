@@ -25,7 +25,7 @@ r <- 0
 
 
 
-model <- function(freq) {
+model <- function(freq, sort=FALSE) {
   r <<- ifelse(floor(sqrt(length(freq))) < ceiling(sqrt(length(freq))), stop(), sqrt(length(freq)))
   inputData <<- freq
 
@@ -239,7 +239,10 @@ model <- function(freq) {
   
   globalAnalysResults <<- analysResults
   cat("\n")
-  print(resultForDisplay)
+  
+  if (is.character(sort)) print(resultForDisplay[order(resultForDisplay[[sort]]),])
+  else print(resultForDisplay)
+  
   cat("---\n")
   cat("Signif. codes:  0  '***'  0.001  '**'  0.01  '*'  0.05  '.'  0.1  ''  1\n")
 }
