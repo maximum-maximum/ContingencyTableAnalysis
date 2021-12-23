@@ -224,35 +224,34 @@ model <- function(freq, sort=FALSE) {
   
   
   ##### show results #####
-  anothExprs <- dfs <- G2s <- AICs <- pValues <- codes <- c()
-  anothExprTargetModels <- paste0(c("LSQI", "LSQU", "LS", "ME"), r-1)
-  anothExprModels <- paste0("(", c("QI", "QU", "QS", "MH"), ")")
+  anothNames <- dfs <- G2s <- AICs <- pValues <- codes <- c()
+  anothNameTargetModels <- paste0(c("LSQI", "LSQU", "LS", "ME"), r-1)
+  anothNameModels <- paste0("(", c("QI", "QU", "QS", "MH"), ")")
   for (model in analysResults) {
     modelName <- names(analysResults[match(list(model), analysResults)])
-    anothModelName <- ""
-    for (i in 1:length(anothExprTargetModels)) {
-      if (modelName == anothExprTargetModels[i]) anothModelName <- anothExprModels[i]
+    anothName <- ""
+    for (i in 1:length(anothNameTargetModels)) {
+      if (modelName == anothNameTargetModels[i]) anothName <- anothNameModels[i]
     }
     p <- round(1 - pchisq(model$deviance, model$df.residual), 4)
     code <- ""
-    if (p>0.05 && p<0.1) code <- "."
+    if (0.05 < p && p < 0.1) code <- "."
     else {
       for (alpha in c(0.05, 0.01, 0.001)) {
         if (p < alpha) code <- paste0(code, "*")
       }
     }
     
-    anothExprs <- append(anothExprs, anothModelName)
+    anothNames <- append(anothNames, anothName)
     dfs <- append(dfs, model$df.residual)
     G2s <- append(G2s, round(model$deviance, 3))
     AICs <- append(AICs, round(model$aic, 3))
     pValues <- append(pValues, p)
     codes <- append(codes, code)
   }
-  resultForDisplay <- data.frame(model=names(analysResults), anothExpr=anothExprs, df=dfs, G2=G2s, AIC=AICs, pValue=pValues, code=codes)
+  resultForDisplay <- data.frame(model=names(analysResults), anothName=anothNames, df=dfs, G2=G2s, AIC=AICs, pValue=pValues, code=codes)
   names(resultForDisplay)[6] <- "Pr(>G2)"
   names(resultForDisplay)[2] <- names(resultForDisplay)[7] <- ""
-  
   
   globalAnalysResults <<- analysResults
   cat("\n")
