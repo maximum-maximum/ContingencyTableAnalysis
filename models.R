@@ -211,7 +211,8 @@ model <- function(freq, sort=FALSE) {
   for (i in (r-1):1) {
     G2 <- -2*(fullModel(freq) - solnpList[[i]]$value[length(solnpList[[i]]$value)])
     maxLogLikeli <- constMolecule - constDenominator + (-solnpList[[i]]$value[length(solnpList[[i]]$value)])
-    AIC <- -2*maxLogLikeli + 2*i
+    paramSize <- r^2 - 1 - i
+    AIC <- -2*maxLogLikeli + 2*paramSize
     
     fittingValue <- round(sum(freq)*(solnpList[[i]]$pars), 3)
     resultMatrix <- t(matrix(paste0(freq," (",fittingValue,")"), r, r))
@@ -226,7 +227,7 @@ model <- function(freq, sort=FALSE) {
   df <- G2 <- AIC <- pValue <- code <- c()
   for (model in analysResults) {
     p <- round(1 - pchisq(model$deviance, model$df.residual), 4)
-    signif.code <- ''
+    signif.code <- ""
     if (p>0.05 && p<0.1) signif.code <- "."
     else {
       for (alpha in c(0.05, 0.01, 0.001)) {
