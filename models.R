@@ -219,6 +219,12 @@ model <- function(freq, sort=FALSE) {
     
     analysResults <- append(analysResults, list(list(deviance=G2, df.residual=i, aic=AIC, result=resultMatrix)))
     names(analysResults)[length(analysResults)] <- paste0("ME", i)
+    
+    # fullMaxLogLikeli <- constMolecule - constDenominator + (-fullModel(freq))
+    # AIC2 <- -2*fullMaxLogLikeli + G2 +2*paramSize
+    # print(AIC)
+    # print(AIC2)
+    # cat("\n")
   }
   
   
