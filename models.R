@@ -273,6 +273,8 @@ model <- function(freq, sort=FALSE) {
 
 detail <- function(model) {
   selectedModelResult <- globalAnalysResults[[model]]
+  modelName <- names(globalAnalysResults[match(list(selectedModelResult), globalAnalysResults)])
+  cat("Model:", modelName, "\n")
   if (length(selectedModelResult) == 30) {
     fittingValue <- round(fitted(selectedModelResult), 3)
     resultMatrix <- t(matrix(paste0(inputData," (",fittingValue,")"), r, r))
