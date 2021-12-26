@@ -231,8 +231,8 @@ model <- function(freq, sort=FALSE) {
   
   ##### show results #####
   anothNames <- dfs <- G2s <- AICs <- pValues <- codes <- c()
-  anothNameTargetModels <- paste0(c("LSQI", "LSQU", "LS", "ME"), r-1)
-  anothNameModels <- paste0("(", c("QI", "QU", "QS", "MH"), ")")
+  anothNameTargetModels <- paste0(c("LSI", "LSU", "LSQI", "LSQU", "LS", "ME"), r-1)
+  anothNameModels <- paste0("(", c("I", "U", "QI", "QU", "QS", "MH"), ")")
   for (model in analysResults) {
     modelName <- names(analysResults[match(list(model), analysResults)])
     anothName <- ""
