@@ -41,13 +41,10 @@ model <- function(freq, sort=FALSE) {
     }
   }
   
-  
   array2 <- c(1:r %x% 1:r)
-  
   
   array2star <- array2
   for (i in 1:r) array2star[i+r*(i-1)] <- 0
-  
   
   array3 <- array(0, dim=c(r,r,r-1))
   for (k in 1:(r-1)) {
@@ -61,7 +58,6 @@ model <- function(freq, sort=FALSE) {
   for (k in 1:(r-1)) {
     f[[k]] <- c(aperm(array3[,,k]))
   }
-  
   
   array4 <- array(0, dim=c(r^2, r))
   for (i in 1:r) {
@@ -77,18 +73,14 @@ model <- function(freq, sort=FALSE) {
   ### SI 
   arraySI <- array1
   
-  
   ### SU 
   arraySU <- cbind(array1, array2)
-
 
   ### SQI
   arraySQI <- cbind(array1, array4)
   
-  
   ### SQU
   arraySQU <- cbind(array1, array4, array2star)
-  
   
   ### S
   s <- array(0, dim=c(1,r,r))
@@ -106,14 +98,12 @@ model <- function(freq, sort=FALSE) {
     }
   }
   
-  
   ### LSIk
   ff <- c()
   for (i in 1:(r-1)) {
     ff <- cbind(ff, f[[i]])
     assign(paste0("arrayLSI", i), cbind(array1, ff))
   }
-  
   
   ### LSUk
   ff <- c()
@@ -122,7 +112,6 @@ model <- function(freq, sort=FALSE) {
     assign(paste0("arrayLSU", i), cbind(array1, ff, array2))
   }
   
-  
   ### LSQIk
   ff <- c()
   for (i in 1:(r-1)) {
@@ -130,14 +119,12 @@ model <- function(freq, sort=FALSE) {
     assign(paste0("arrayLSQI", i), cbind(array1, ff, array4))
   }
   
-  
   ### LSQUk
   ff <- c()
   for (i in 1:(r-1)) {
     ff <- cbind(ff, f[[i]])
     assign(paste0("arrayLSQU", i), cbind(array1, ff, array4, array2star))
   }
-
 
   ### LSk
   ff <- c()
@@ -147,9 +134,12 @@ model <- function(freq, sort=FALSE) {
   }
   
 
+  
   ##### analyze with each model #####
   analysResults <- list()
   models <- c("SI", "SU", "SQI", "SQU", "S", "LSI", "LSU", "LSQI", "LSQU", "LS")
+  
+  ### except MEk
   for (modelIndex in 1:length(models)) {
     if (modelIndex <= which(models == "S")) {
       formula <- as.formula(paste0("freq~array", models[modelIndex]))
@@ -165,7 +155,6 @@ model <- function(freq, sort=FALSE) {
       }
     }
   }
-  
   
   ### MEk
   library(Rsolnp)
@@ -193,34 +182,35 @@ model <- function(freq, sort=FALSE) {
   fullModel <- function(freq) return(-sum(removeZero(freq)*log(removeZero(freq/sum(freq)))))
   paramLowerBound <- rep(0, length(freq))
   p0 <- rep(1/length(freq), length(freq))
+
   solnpList <- list()
   for (i in 1:(r-1)) {
     solnp <- solnp(p0, fun=objectFunc, eqfun=constraintFunc, eqB=equationValue[[i]], LB=paramLowerBound)
     solnpList <- append(solnpList, list(solnp))
   }
   
-  constMolecule <- 0
-  constDenominator <- 0
-  for (i in 1:sum(freq)) constMolecule <- constMolecule + log(i)
+  moleculeOfConst <- 0
+  denominatorOfConst <- 0
+  for (i in 1:sum(freq)) moleculeOfConst <- moleculeOfConst + log(i)
   for (i in removeZero(freq)) {
     for (j in 1:i) {
-      constDenominator <- constDenominator + log(j)
+      denominatorOfConst <- denominatorOfConst + log(j)
     }
   }
   
   for (i in (r-1):1) {
     G2 <- -2*(fullModel(freq) - solnpList[[i]]$value[length(solnpList[[i]]$value)])
-    maxLogLikeli <- constMolecule - constDenominator + (-solnpList[[i]]$value[length(solnpList[[i]]$value)])
+    maxLogLikeli <- moleculeOfConst - denominatorOfConst + (-solnpList[[i]]$value[length(solnpList[[i]]$value)])
     paramSize <- r^2 - 1 - i
     AIC <- -2*maxLogLikeli + 2*paramSize
     
     fittingValue <- round(sum(freq)*(solnpList[[i]]$pars), 3)
-    resultMatrix <- t(matrix(paste0(freq," (",fittingValue,")"), r, r))
+    resultMatrix <- t(matrix(paste0(freq, " (", fittingValue, ")"), r, r))
     
     analysResults <- append(analysResults, list(list(deviance=G2, df.residual=i, aic=AIC, result=resultMatrix)))
     names(analysResults)[length(analysResults)] <- paste0("ME", i)
     
-    # fullMaxLogLikeli <- constMolecule - constDenominator + (-fullModel(freq))
+    # fullMaxLogLikeli <- moleculeOfConst - denominatorOfConst + (-fullModel(freq))
     # AIC2 <- -2*fullMaxLogLikeli + G2 +2*paramSize
     # print(AIC)
     # print(AIC2)
@@ -233,26 +223,27 @@ model <- function(freq, sort=FALSE) {
   anothNames <- dfs <- G2s <- AICs <- pValues <- codes <- c()
   anothNameTargetModels <- paste0(c("LSI", "LSU", "LSQI", "LSQU", "LS", "ME"), r-1)
   anothNameModels <- paste0("(", c("I", "U", "QI", "QU", "QS", "MH"), ")")
+
   for (model in analysResults) {
     modelName <- names(analysResults[match(list(model), analysResults)])
     anothName <- ""
     for (i in 1:length(anothNameTargetModels)) {
       if (modelName == anothNameTargetModels[i]) anothName <- anothNameModels[i]
     }
-    p <- round(1 - pchisq(model$deviance, model$df.residual), 4)
+    pValue <- round(1 - pchisq(model$deviance, model$df.residual), 4)
     code <- ""
-    if (0.05 < p && p < 0.1) code <- "."
+    if (0.05 < pValue && pValue < 0.1) code <- "."
     else {
       for (alpha in c(0.05, 0.01, 0.001)) {
-        if (p < alpha) code <- paste0(code, "*")
+        if (pValue < alpha) code <- paste0(code, "*")
       }
     }
     
     anothNames <- append(anothNames, anothName)
     dfs <- append(dfs, model$df.residual)
-    G2s <- append(G2s, round(model$deviance, 3))
-    AICs <- append(AICs, round(model$aic, 3))
-    pValues <- append(pValues, p)
+    G2s <- append(G2s, round(model$deviance, 2))
+    AICs <- append(AICs, round(model$aic, 2))
+    pValues <- append(pValues, pValue)
     codes <- append(codes, code)
   }
   resultForDisplay <- data.frame(model=names(analysResults), anothName=anothNames, df=dfs, G2=G2s, AIC=AICs, pValue=pValues, code=codes)
@@ -273,10 +264,11 @@ model <- function(freq, sort=FALSE) {
 
 detail <- function(model) {
   selectedModelResult <- globalAnalysResults[[model]]
+  glmObjSize <- 30
   modelName <- names(globalAnalysResults[match(list(selectedModelResult), globalAnalysResults)])
   cat("Model:", modelName, "\n")
-  if (length(selectedModelResult) == 30) {
-    fittingValue <- round(fitted(selectedModelResult), 3)
+  if (length(selectedModelResult) == glmObjSize) {
+    fittingValue <- round(fitted(selectedModelResult), 2)
     resultMatrix <- t(matrix(paste0(inputData," (",fittingValue,")"), r, r))
     
     print(summary(selectedModelResult))
