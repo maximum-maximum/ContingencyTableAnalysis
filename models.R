@@ -46,17 +46,15 @@ model <- function(freq, sort=FALSE) {
   array2star <- array2
   for (i in 1:r) array2star[i+r*(i-1)] <- 0
   
-  array3 <- array(0, dim=c(r,r,r-1))
+  array3 <- list()
   for (k in 1:(r-1)) {
+    tmp <- c()
     for (i in 1:r) {
       for (j in 1:r) {
-        array3[i, j, k] <- i^k - j^k
+        tmp <- c(tmp, i^k-j^k)
       }
     }
-  }
-  f <- list()
-  for (k in 1:(r-1)) {
-    f[[k]] <- c(aperm(array3[,,k]))
+    array3[[k]] <- tmp
   }
   
   array4 <- array(0, dim=c(r^2, r))
@@ -99,47 +97,47 @@ model <- function(freq, sort=FALSE) {
   }
   
   ### LSIk
-  ff <- c()
+  bindedArray3 <- c()
   for (i in 1:(r-1)) {
-    ff <- cbind(ff, f[[i]])
-    assign(paste0("arrayLSI", i), cbind(array1, ff))
+    bindedArray3 <- cbind(bindedArray3, array3[[i]])
+    assign(paste0("arrayLSI", i), cbind(array1, bindedArray3))
   }
   
   ### LSUk
-  ff <- c()
+  bindedArray3 <- c()
   for (i in 1:(r-1)) {
-    ff <- cbind(ff, f[[i]])
-    assign(paste0("arrayLSU", i), cbind(array1, ff, array2))
+    bindedArray3 <- cbind(bindedArray3, array3[[i]])
+    assign(paste0("arrayLSU", i), cbind(array1, bindedArray3, array2))
   }
   
   ### LSQIk
-  ff <- c()
+  bindedArray3 <- c()
   for (i in 1:(r-1)) {
-    ff <- cbind(ff, f[[i]])
-    assign(paste0("arrayLSQI", i), cbind(array1, ff, array4))
+    bindedArray3 <- cbind(bindedArray3, array3[[i]])
+    assign(paste0("arrayLSQI", i), cbind(array1, bindedArray3, array4))
   }
   
   ### LSQUk
-  ff <- c()
+  bindedArray3 <- c()
   for (i in 1:(r-1)) {
-    ff <- cbind(ff, f[[i]])
-    assign(paste0("arrayLSQU", i), cbind(array1, ff, array4, array2star))
+    bindedArray3 <- cbind(bindedArray3, array3[[i]])
+    assign(paste0("arrayLSQU", i), cbind(array1, bindedArray3, array4, array2star))
   }
 
   ### LSk
-  ff <- c()
+  bindedArray3 <- c()
   for (i in 1:(r-1)) {
-    ff <- cbind(ff, f[[i]])
-    assign(paste0("arrayLS", i), cbind(arrayS, ff))
+    bindedArray3 <- cbind(bindedArray3, array3[[i]])
+    assign(paste0("arrayLS", i), cbind(arrayS, bindedArray3))
   }
   
 
   
   ##### analyze with each model #####
   analysResults <- list()
-  models <- c("SI", "SU", "SQI", "SQU", "S", "LSI", "LSU", "LSQI", "LSQU", "LS")
   
   ### except MEk
+  models <- c("SI", "SU", "SQI", "SQU", "S", "LSI", "LSU", "LSQI", "LSQU", "LS")
   for (modelIndex in 1:length(models)) {
     if (modelIndex <= which(models == "S")) {
       formula <- as.formula(paste0("freq~array", models[modelIndex]))
@@ -269,7 +267,7 @@ detail <- function(model) {
   cat("Model:", modelName, "\n")
   if (length(selectedModelResult) == glmObjSize) {
     fittingValue <- round(fitted(selectedModelResult), 2)
-    resultMatrix <- t(matrix(paste0(inputData," (",fittingValue,")"), r, r))
+    resultMatrix <- t(matrix(paste0(inputData, " (", fittingValue, ")"), r, r))
     
     print(summary(selectedModelResult))
     cat("Data:\n")
