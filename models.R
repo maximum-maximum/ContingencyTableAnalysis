@@ -30,7 +30,7 @@ model <- function(freq, sort=FALSE) {
   inputData <<- freq
 
   
-  ##### define design matrices #####
+  ##### define the parts of a design matrices #####
   array1 <- array(0, dim=c(r^2, (r-1)))
   k <- 1
   for (i in 1:r) {
@@ -51,7 +51,7 @@ model <- function(freq, sort=FALSE) {
     tmp <- c()
     for (i in 1:r) {
       for (j in 1:r) {
-        tmp <- c(tmp, i^k-j^k)
+        tmp <- c(tmp, j^k - i^k)
       }
     }
     array3[[k]] <- tmp
@@ -64,7 +64,6 @@ model <- function(freq, sort=FALSE) {
       break
     }
   }
-  
   
   
   ##### bind matrices #####
@@ -132,7 +131,6 @@ model <- function(freq, sort=FALSE) {
   }
   
 
-  
   ##### analyze with each model #####
   analysResults <- list()
   
@@ -166,7 +164,7 @@ model <- function(freq, sort=FALSE) {
       momentConstraints <- c()
       for (i in 1:r) {
         for (j in 1:r) {
-          momentConstraints <- c(momentConstraints, i^k-j^k)
+          momentConstraints <- c(momentConstraints, j^k - i^k)
         }
       }
       MEkConstraints <- append(MEkConstraints, sum(momentConstraints*p))
@@ -187,8 +185,7 @@ model <- function(freq, sort=FALSE) {
     solnpList <- append(solnpList, list(solnp))
   }
   
-  moleculeOfConst <- 0
-  denominatorOfConst <- 0
+  moleculeOfConst <- denominatorOfConst <- 0
   for (i in 1:sum(freq)) moleculeOfConst <- moleculeOfConst + log(i)
   for (i in removeZero(freq)) {
     for (j in 1:i) {
@@ -197,7 +194,7 @@ model <- function(freq, sort=FALSE) {
   }
   
   for (i in (r-1):1) {
-    G2 <- -2*(fullModel(freq) - solnpList[[i]]$value[length(solnpList[[i]]$value)])
+    G2 <- 2*((-fullModel(freq)) - (-solnpList[[i]]$value[length(solnpList[[i]]$value)]))
     maxLogLikeli <- moleculeOfConst - denominatorOfConst + (-solnpList[[i]]$value[length(solnpList[[i]]$value)])
     paramSize <- r^2 - 1 - i
     AIC <- -2*maxLogLikeli + 2*paramSize
@@ -216,9 +213,9 @@ model <- function(freq, sort=FALSE) {
   }
   
   
-  
   ##### show results #####
   anothNames <- dfs <- G2s <- AICs <- pValues <- codes <- c()
+  
   anothNameTargetModels <- paste0(c("LSI", "LSU", "LSQI", "LSQU", "LS", "ME"), r-1)
   anothNameModels <- paste0("(", c("I", "U", "QI", "QU", "QS", "MH"), ")")
 
@@ -245,8 +242,8 @@ model <- function(freq, sort=FALSE) {
     codes <- append(codes, code)
   }
   resultForDisplay <- data.frame(model=names(analysResults), anothName=anothNames, df=dfs, G2=G2s, AIC=AICs, pValue=pValues, code=codes)
-  names(resultForDisplay)[6] <- "Pr(>G2)"
   names(resultForDisplay)[2] <- names(resultForDisplay)[7] <- ""
+  names(resultForDisplay)[6] <- "Pr(>G2)"
   
   globalAnalysResults <<- analysResults
   cat("\n")
@@ -265,6 +262,7 @@ detail <- function(model) {
   glmObjSize <- 30
   modelName <- names(globalAnalysResults[match(list(selectedModelResult), globalAnalysResults)])
   cat("Model:", modelName, "\n")
+  
   if (length(selectedModelResult) == glmObjSize) {
     fittingValue <- round(fitted(selectedModelResult), 2)
     resultMatrix <- t(matrix(paste0(inputData, " (", fittingValue, ")"), r, r))
