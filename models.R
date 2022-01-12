@@ -4,16 +4,16 @@ rm(list = ls(all.names = TRUE))
 
 
 ##### data samples #####
-## Yamamoto-Tomizawa2010 Table1
+### Yamamoto-Tomizawa2010 Table1 ###
 freq <- c(29, 3, 3, 4, 5, 0, 1, 1, 9, 0, 2, 0, 7, 3, 1, 0) 
 
-## Yamamoto-Tomizawa2010 Table2
+### Yamamoto-Tomizawa2010 Table2 ###
 freq2 <- c(6, 2, 3, 1, 9, 4, 2, 1, 9, 2, 3, 1, 12, 1, 2, 1) 
 
-## Tominaga1979 (Tahata2016)
+### Tominaga1979 (Tahata2016) ###
 freq3 <- c(374, 602, 170, 64, 18, 255, 139, 71, 4, 23, 42, 55, 2, 6, 17, 53) 
 
-## Smith2006, cross-classification of GSS (Tahata-Sudo-Arimoto)
+### Smith2006, cross-classification of GSS (Tahata-Sudo-Arimoto) ###
 freq4 <- c(98, 150, 135, 53, 37, 131, 133, 43, 9, 16, 33, 15, 4, 1, 4, 21)
 
 
@@ -30,7 +30,7 @@ model <- function(freq, sort=FALSE) {
   inputData <<- freq
 
   
-  ##### define the parts of a design matrices #####
+  ##### define the parts of design matrices #####
   array1 <- array(0, dim=c(r^2, (r-1)))
   k <- 1
   for (i in 1:r) {
@@ -67,20 +67,20 @@ model <- function(freq, sort=FALSE) {
   
   
   ##### bind matrices #####
-  ### SI 
+  ### SI ###
   arraySI <- array1
   
-  ### SU 
+  ### SU ###
   arraySU <- cbind(array1, array2)
 
-  ### SQI
+  ### SQI ###
   arraySQI <- cbind(array1, array4)
   
-  ### SQU
+  ### SQU ###
   arraySQU <- cbind(array1, array4, array2star)
   
-  ### S
-  s <- array(0, dim=c(1,r,r))
+  ### S ###
+  s <- array(0, dim=c(1, r, r))
   arrayS <- c()
   for (i in 1:r) {
     for (j in 1:r) {
@@ -91,39 +91,39 @@ model <- function(freq, sort=FALSE) {
         s[1, i, j] <- s[1, j, i] <- 1
         arrayS <- cbind(arrayS, c(s[1,,]))
       }
-      s <- array(0, dim=c(1,r,r))
+      s <- array(0, dim=c(1, r, r))
     }
   }
   
-  ### LSIk
+  ### LSIk ###
   bindedArray3 <- c()
   for (i in 1:(r-1)) {
     bindedArray3 <- cbind(bindedArray3, array3[[i]])
     assign(paste0("arrayLSI", i), cbind(array1, bindedArray3))
   }
   
-  ### LSUk
+  ### LSUk ###
   bindedArray3 <- c()
   for (i in 1:(r-1)) {
     bindedArray3 <- cbind(bindedArray3, array3[[i]])
     assign(paste0("arrayLSU", i), cbind(array1, bindedArray3, array2))
   }
   
-  ### LSQIk
+  ### LSQIk ###
   bindedArray3 <- c()
   for (i in 1:(r-1)) {
     bindedArray3 <- cbind(bindedArray3, array3[[i]])
     assign(paste0("arrayLSQI", i), cbind(array1, bindedArray3, array4))
   }
   
-  ### LSQUk
+  ### LSQUk ###
   bindedArray3 <- c()
   for (i in 1:(r-1)) {
     bindedArray3 <- cbind(bindedArray3, array3[[i]])
     assign(paste0("arrayLSQU", i), cbind(array1, bindedArray3, array4, array2star))
   }
 
-  ### LSk
+  ### LSk ###
   bindedArray3 <- c()
   for (i in 1:(r-1)) {
     bindedArray3 <- cbind(bindedArray3, array3[[i]])
@@ -134,7 +134,7 @@ model <- function(freq, sort=FALSE) {
   ##### analyze with each model #####
   analysResults <- list()
   
-  ### except MEk
+  ### models except MEk ###
   models <- c("SI", "SU", "SQI", "SQU", "S", "LSI", "LSU", "LSQI", "LSQU", "LS")
   for (modelIndex in 1:length(models)) {
     if (modelIndex <= which(models == "S")) {
@@ -152,7 +152,7 @@ model <- function(freq, sort=FALSE) {
     }
   }
   
-  ### MEk
+  ### MEk model ###
   library(Rsolnp)
   #source("solnp.R")
   constraintFunc <- function(p){
@@ -204,12 +204,6 @@ model <- function(freq, sort=FALSE) {
     
     analysResults <- append(analysResults, list(list(deviance=G2, df.residual=i, aic=AIC, result=resultMatrix)))
     names(analysResults)[length(analysResults)] <- paste0("ME", i)
-    
-    # fullMaxLogLikeli <- moleculeOfConst - denominatorOfConst + (-fullModel(freq))
-    # AIC2 <- -2*fullMaxLogLikeli + G2 +2*paramSize
-    # print(AIC)
-    # print(AIC2)
-    # cat("\n")
   }
   
   
@@ -271,5 +265,6 @@ detail <- function(model) {
     cat("Data:\n")
     print(resultMatrix)
   } else print(selectedModelResult)
+  
   cat("(The parenthesized values are the MLEs of expected frequencies under the selected model)")
 }
