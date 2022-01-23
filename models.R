@@ -30,7 +30,7 @@ model <- function(freq, sort=FALSE) {
   inputData <<- freq
 
   
-  ##### define the parts of design matrices #####
+  ##### make parts of design matrices #####
   array1 <- array(0, dim=c(r^2, (r-1)))
   k <- 1
   for (i in 1:r) {
@@ -65,8 +65,18 @@ model <- function(freq, sort=FALSE) {
     }
   }
   
+  array5 <- array(0, dim=c(r^2, r*(r+1)/2))
+  k <- 1
+  for (i in 1:r) {
+    for (j in 1:r) {
+      if (i > j) array5[k, (j-1)*(2*r-j)/2+i] <- array5[k, (j-1)*(2*r-j)/2+i] + 1
+      else array5[k, (i-1)*(2*r-i)/2+j] <- array5[k, (i-1)*(2*r-i)/2+j] + 1
+      k <- k + 1
+    }
+  }
   
-  ##### bind matrices #####
+  
+  ##### define design matrices #####
   ### SI ###
   arraySI <- array1
   
@@ -80,20 +90,7 @@ model <- function(freq, sort=FALSE) {
   arraySQU <- cbind(array1, array4, array2star)
   
   ### S ###
-  s <- array(0, dim=c(1, r, r))
-  arrayS <- c()
-  for (i in 1:r) {
-    for (j in 1:r) {
-      if (i == j) {
-        s[1, i, j] <- 1
-        arrayS <- cbind(arrayS, c(s[1,,]))
-      } else if (i < j) {
-        s[1, i, j] <- s[1, j, i] <- 1
-        arrayS <- cbind(arrayS, c(s[1,,]))
-      }
-      s <- array(0, dim=c(1, r, r))
-    }
-  }
+  arrayS <- array5
   
   ### LSIk ###
   bindedArray3 <- c()
@@ -127,7 +124,7 @@ model <- function(freq, sort=FALSE) {
   bindedArray3 <- c()
   for (i in 1:(r-1)) {
     bindedArray3 <- cbind(bindedArray3, array3[[i]])
-    assign(paste0("arrayLS", i), cbind(arrayS, bindedArray3))
+    assign(paste0("arrayLS", i), cbind(array5, bindedArray3))
   }
   
 
