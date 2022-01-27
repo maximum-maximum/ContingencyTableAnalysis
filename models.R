@@ -76,7 +76,7 @@ model <- function(freq, sort=FALSE) {
   }
   
   
-  ##### define design matrices #####
+  ##### define matrices #####
   ### SI ###
   arraySI <- array1
   
