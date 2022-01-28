@@ -270,7 +270,8 @@ model <- function(freq, sort=FALSE) {
   }
   resultForDisplay <- data.frame(model=names(analysResults), anothName=anothNames, df=dfs, G2=G2s, AIC=AICs, pValue=pValues, code=codes)
   names(resultForDisplay)[2] <- names(resultForDisplay)[7] <- ""
-  names(resultForDisplay)[6] <- "Pr(>G2)"
+  names(resultForDisplay)[4] <- "G^2"
+  names(resultForDisplay)[6] <- "Pr(>G^2)"
   
   globalAnalysResults <<- analysResults
   cat("\n")
