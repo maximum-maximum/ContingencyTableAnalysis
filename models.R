@@ -19,8 +19,7 @@ freq4 <- c(98, 150, 135, 53, 37, 131, 133, 43, 9, 16, 33, 15, 4, 1, 4, 21)
 
 
 ##### initailize global objects #####
-globalAnalysResults <- list()
-inputData <- c()
+globalAnalysResults <- inputData <- list()
 r <- 0
 
 
@@ -31,7 +30,7 @@ model <- function(freq, sort=FALSE) {
 
   
   ##### make parts of design matrices #####
-  array1 <- array(0, dim=c(r^2, (r-1)))
+  array1 <- array(0, dim=c(r^2, r-1))
   k <- 1
   for (i in 1:r) {
     for (j in 1:r) {
@@ -76,7 +75,7 @@ model <- function(freq, sort=FALSE) {
   }
   
   
-  ##### define matrices #####
+  ##### define design matrices #####
   ### SI ###
   arraySI <- array1
   
@@ -150,7 +149,7 @@ model <- function(freq, sort=FALSE) {
   ### Cov=0 ###
   cov0ConstrFunc <- function(p) {
     cov0Constraints <- c()
-    cov0Constraints <- append(cov0Constraints, sum(p) -1)
+    cov0Constraints <- append(cov0Constraints, sum(p) - 1)
     
     pMatrix <- matrix(p, r, r, T)
     prodOfExp <- c()
@@ -191,6 +190,7 @@ model <- function(freq, sort=FALSE) {
   
   removeZero <- function(freq) return(freq[freq > 0])
   objectFunc <- function(p) return(-sum(freq*log(p)))
+  
   paramLowerBound <- rep(0, length(freq))
   equationValue <- list()
   for (i in 1:(r-1)) equationValue <- append(equationValue, list(rep(0, i+1)))
