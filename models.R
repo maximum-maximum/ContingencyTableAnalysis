@@ -152,22 +152,38 @@ model <- function(freq, sort=FALSE) {
   ### MEk model ###
   library(Rsolnp)
   #source("solnp.R")
-  constraintFunc <- function(p){
+  MEkConstrFunc <- function(p) {
     MEkConstraints <- c()
-    MEkConstraints <- append(MEkConstraints, sum(p)-1)
+    MEkConstraints <- append(MEkConstraints, sum(p) - 1)
     
     l <- length(solnpList) + 1
     for (k in 1:l) {
       momentConstraints <- c()
       for (i in 1:r) {
         for (j in 1:r) {
-          momentConstraints <- c(momentConstraints, j^k - i^k)
+          momentConstraints <- append(momentConstraints, j^k - i^k)
         }
       }
       MEkConstraints <- append(MEkConstraints, sum(momentConstraints*p))
     }
     return(MEkConstraints)
   }
+  
+  cov0ConstrFunc <- function(p) {
+    cov0Constraints <- c()
+    cov0Constraints <- append(cov0Constraints, sum(p) -1)
+    
+    pMatrix <- matrix(p, r, r, T)
+    prodOfExp <- c()
+    for (i in 1:r) {
+      for (j in 1:r) {
+        prodOfExp <- append(prodOfExp, rowSums(pMatrix)[i] * colSums(pMatrix)[j])
+      }
+    }
+    cov0Constraints <- append(cov0Constraints, sum(c(1:r %x% 1:r) * (p-prodOfExp)))
+    return(cov0Constraints)
+  }
+  
   equationValue <- list()
   for (i in 1:(r-1)) equationValue <- append(equationValue, list(rep(0, i+1)))
   removeZero <- function(freq) return(freq[freq > 0])
@@ -178,9 +194,11 @@ model <- function(freq, sort=FALSE) {
 
   solnpList <- list()
   for (i in 1:(r-1)) {
-    solnp <- solnp(p0, fun=objectFunc, eqfun=constraintFunc, eqB=equationValue[[i]], LB=paramLowerBound)
+    solnp <- solnp(p0, fun=objectFunc, eqfun=MEkConstrFunc, eqB=equationValue[[i]], LB=paramLowerBound)
     solnpList <- append(solnpList, list(solnp))
   }
+  
+  solnp <- solnp(p0, fun=objectFunc, eqfun=cov0ConstrFunc, eqB=c(0,0), LB=paramLowerBound)
   
   moleculeOfConst <- denominatorOfConst <- 0
   for (i in 1:sum(freq)) moleculeOfConst <- moleculeOfConst + log(i)
@@ -202,6 +220,17 @@ model <- function(freq, sort=FALSE) {
     analysResults <- append(analysResults, list(list(deviance=G2, df.residual=i, aic=AIC, result=resultMatrix)))
     names(analysResults)[length(analysResults)] <- paste0("ME", i)
   }
+  
+  G2 <- 2*((-fullModel(freq)) - (-solnp$value[length(solnp$value)]))
+  maxLogLikeli <- moleculeOfConst - denominatorOfConst + (-solnp$value[length(solnp$value)])
+  paramSize <- r^2 - 2
+  AIC <- -2*maxLogLikeli + 2*paramSize
+  
+  fittingValue <- round(sum(freq)*(solnp$pars), 3)
+  resultMatrix <- t(matrix(paste0(freq, " (", fittingValue, ")"), r, r))
+  
+  analysResults <- append(analysResults, list(list(deviance=G2, df.residual=i, aic=AIC, result=resultMatrix)))
+  names(analysResults)[length(analysResults)] <- "Cov=0"
   
   
   ##### show results #####
