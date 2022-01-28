@@ -208,17 +208,17 @@ model <- function(freq, sort=FALSE) {
     }
   }
   
-  for (i in (r-1):1) {
-    G2 <- 2*((-fullModel(freq)) - (-solnpList[[i]]$value[length(solnpList[[i]]$value)]))
-    maxLogLikeli <- moleculeOfConst - denominatorOfConst + (-solnpList[[i]]$value[length(solnpList[[i]]$value)])
-    paramSize <- r^2 - 1 - i
+  for (k in (r-1):1) {
+    G2 <- 2*((-fullModel(freq)) - (-solnpList[[k]]$value[length(solnpList[[k]]$value)]))
+    maxLogLikeli <- moleculeOfConst - denominatorOfConst + (-solnpList[[k]]$value[length(solnpList[[k]]$value)])
+    paramSize <- r^2 - 1 - k
     AIC <- -2*maxLogLikeli + 2*paramSize
     
-    fittingValue <- round(sum(freq)*(solnpList[[i]]$pars), 3)
+    fittingValue <- round(sum(freq)*(solnpList[[k]]$pars), 3)
     resultMatrix <- t(matrix(paste0(freq, " (", fittingValue, ")"), r, r))
     
     analysResults <- append(analysResults, list(list(deviance=G2, df.residual=i, aic=AIC, result=resultMatrix)))
-    names(analysResults)[length(analysResults)] <- paste0("ME", i)
+    names(analysResults)[length(analysResults)] <- paste0("ME", k)
   }
   
   G2 <- 2*((-fullModel(freq)) - (-solnp$value[length(solnp$value)]))
