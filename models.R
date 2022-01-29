@@ -213,7 +213,6 @@ model <- function(freq, sort=FALSE) {
   tmp <- solnp(p0, fun=objectFunc, eqfun=cov0ConstrFunc, eqB=c(0,0), LB=paramLowerBound)
   cov0Solnp <- list(tmp)
   
-  
   getValues <- function(solnpList) {
     for (k in length(solnpList):1) {
       if (length(solnpList) == r-1) {
