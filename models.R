@@ -23,7 +23,6 @@ globalAnalysResults <- inputData <- list()
 r <- 0
 
 
-
 model <- function(freq, sort=FALSE) {
   r <<- ifelse(floor(sqrt(length(freq))) < ceiling(sqrt(length(freq))), stop(), sqrt(length(freq)))
   inputData <<- freq
