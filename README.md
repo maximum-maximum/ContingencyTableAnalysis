@@ -27,11 +27,11 @@ The sort argument can be given as string "df", "G^2", "AIC", or "Pr(>G^2)" as ne
 ### `detail(model)`
 
 The detail function returns detailed results for models of interest from the results of various models obtained by the model function.
-This takes model as an argument.
+This takes `model` as an argument.
 
 ## Example
 
-For an example analysis, consider the following square contingency table.
+For an example analysis, consider the following 4 x 4 square contingency table.
 
 | ＼  | Y_1 | Y_2 | Y_3 | Y_4 |
 | --- | --- | --- | --- | --- |
