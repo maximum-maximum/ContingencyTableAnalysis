@@ -49,6 +49,7 @@ po/*~
 /*_files/
 
 # some files
+/example
 mph.readme
 mph.Rcode.txt
 master_paper.R
